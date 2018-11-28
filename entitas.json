@@ -1,0 +1,191 @@
+{
+	"namespace": "Entitas",
+	"src": "src/ecs",
+	"output": "",
+	"alloc": {
+		"entities": 32,
+		"components": 16
+	},
+	"components": {
+		"Movable": false,
+		"Position": [
+			"x:number",
+			"y:number"
+		],
+		"FramePosition": [
+			"x:number",
+			"y:number",
+			"frameIndex:WeGame.FrameIndex"
+		],
+		"GridType": [
+			"gridType:WeGame.GridType"
+		],
+		"Destroy": false,
+		"UnNormalDestroy": false,
+		
+		"ResetGameBoard": false,
+		"GameBoardCache": [
+			"grid:Array<Array<Entity>>",
+			"gridTypeArray: {[key:number] : {[key:number] : Entity}}",
+			"gridTypeLength: any"
+		],
+		"ViewGrid": [
+			"value: {[key:number] : {[key:number] : Entity}}"
+		],
+		"ViewPos": [
+			"x : number",
+			"y : number"
+		
+		],
+		"Angle": [
+			"value : number"
+		],
+		"SortOrder": [
+			"value : number"
+		],
+		"Scale": [
+			"value : number"
+		],
+		"GameBoard": [
+			"levelName:string",
+			"rows : number",
+			"columns : number",
+			"levelConfig:Config.LevelMapConfig"
+		],
+		"GameBoardElement": false,
+		"ElementConfig": [
+			"config : Config.Element"
+		],
+		"MoveTween": [
+			"posArray : Array<Laya.Point>"
+		],
+		"Input": [
+			"x:number",
+			"y:number",
+			"touchType: WeGame.TouchType"
+		],
+		"Link": [
+			"linkArray:Array<Entity>",
+			"gridType:WeGame.GridType"
+		
+		],
+		"CheckCanEliminate": false,
+		"Linked": [
+			"index:number"
+		],
+		"Health": [
+			"hp : number"
+		],
+		"Interactive": false,
+		"Resource": [
+			"name:string"
+		],
+		"View": [
+			"sprite:any"
+		],
+		"Score": [
+			"value:number"
+		],
+		"Item": [
+			"itemId:number",
+			"itemNum:number"
+		],
+		"ItemUse": false,
+		"ItemUsePos": [
+			"posX : number",
+			"posY : number"
+		],
+		"TimeRecord": [
+			"Value : number"
+		],
+		"ElementDiedRecord": [],
+		"MonsterDiedRecord": [],
+		"MapRecord": [
+			"value : {[key:number] : number}"
+		],
+		"Monster": [
+			"config : Config.MonsterConfig"
+		],
+		"IdComponent": [
+			"value: number"
+		],
+		"Moving": false,
+		"ElementFrame": false,
+		"ElementFrameConfig": [
+			"value : Config.ElementFrame"
+		],
+		"ElementFrameBoardCache": [
+			"value:Array<Array<Array<Entity>>>"
+		]
+	},
+	"systems": {
+		"DestroySystem": true,
+		"FallSystem": true,
+		"FillSystem": true,
+		"CreateGameBoardCacheSystem": true,
+		"GameBoardSystem": true,
+		"ProcessInputSystem": true,
+		"RenderPositionSystem": true,
+		"AddViewSystem": true,
+		"RemoveViewSystem": true,
+		"ScoreSystem": true,
+		"LinkSystem": true,
+		"CheckCanEliminateSystem": true,
+		"ItemSystem": true,
+		"TimeRecordSystem": true,
+		"ElementDiedSystem": true,
+		"ElementFrameBoardCacheSystem": true
+	},
+	"entities": {
+		"GameBoardCache": true,
+		"GameBoard": true,
+		"ViewGrid": true,
+		"ResetGameBoard": true,
+		"Score": true,
+		"Link": true,
+		"Item": true,
+		"TimeRecord": true,
+		"ElementDiedRecord": true,
+		"MonsterDiedRecord": true,
+		"ElementFrameBoardCache": true
+	},
+	"extensions": {
+		"Pool": {
+			"createRandomPiece:Entity": [
+				"x:number",
+				"y:number",
+				"viewPosx:number",
+				"viewPosy:number"
+			],
+			"createElementFrame:Entity": [
+				"frameData:Config.LineData"
+			],
+			"createBlocker:Entity": [
+				"x:number",
+				"y:number"
+			],
+			"removeRow:void": [
+				"y:number"
+			],
+			"removeColumn:void": [
+				"x:number"
+			],
+			"removeAll:void": [],
+			"removeSame:void": [
+				"gridType:WeGame.GridType"
+			],
+			
+			"ShuffleGamebord:void": [],
+			"createEmptyEntity : Entity": []
+		},
+		"Entity": {
+			"getFourNeighbor:Array<Entity>": [
+				"grid:Array<Array<Entity>>"
+			],
+			"getDirection:WeGame.FrameIndex": [
+				"x:number",
+				"y:number"
+			]
+		}
+	}
+}
