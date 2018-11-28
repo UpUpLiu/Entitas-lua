@@ -52,9 +52,6 @@ end
 
 function Utils.class( tDerived, ... )
     local arg = {...}
-    --local tDerived = tDerived
-    --tDerived.__className = className
-    -- 这里是把所有的基类放到 tDerived.__tbl_Bseclass__ 里面
     tDerived.__tbl_Baseclass__ =  {}
     tDerived.__base = arg[1]
     for index = 1, #arg do
@@ -63,24 +60,18 @@ function Utils.class( tDerived, ... )
         for i = 1, #tBaseClass.__tbl_Baseclass__ do
             table.insert(tDerived.__tbl_Baseclass__, tBaseClass.__tbl_Baseclass__[i])
         end
-        --for key, value in pairs(tBaseClass.__cname) do
-        --    tDerived.__cname[tostring(key)] = value
-        --end
     end
 
-    -- 所有对实例对象的访问都会访问转到tDerived上
     local InstanceMt =  { __index = tDerived }
 
-    --构造函数参数的传递，只支持一层, 出于动态语言的特性以及性能的考虑
     tDerived.new = function( self, ... )
         local NewInstance = {}
-        NewInstance.__ClassDefine__ = self    -- IsType 函数的支持由此来
+        NewInstance.__ClassDefine__ = self   
 
         NewInstance.IsClass = function( self, classtype )
             return self.__ClassDefine__:IsClass(classtype)
         end
 
-        -- 这里要放到调用构造函数之前，因为构造函数里面，可能调用基类的成员函数或者成员变量
         setmetatable( NewInstance, InstanceMt )
         NewInstance.__index = tDerived
         local funcCtor = rawget(self, "Ctor")
