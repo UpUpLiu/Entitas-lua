@@ -27,3 +27,8 @@ entitas.json为Ecs的生成配置，  这是一个简单的示例。
 # 最后
 
 我自己的项目是会持续使用， 并且会在之后的上传简单的Unity例子工程
+
+
+# 测试
+测试环境: lua5.3.4, windows
+测试方法: lua53.exe test_runtime.lua (需要先进行生成)
