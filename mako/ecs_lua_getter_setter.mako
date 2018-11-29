@@ -46,18 +46,47 @@ local ${Name}Component = {}
     %endif
 % endfor
 
+## property, getter, setter
+local boolEntityPropertyMt = {
+%for Name in components:
+<%
+    properties = components[Name]
+%>\
+    %if properties == False:
+        is${Name} = function(self)
+            return self:hasComponent(CoreComponentIds.${Name})
+        end,
+        set${Name} = function(self, v)
+            if (v ~= self.is${Name}) then
+                if (v) then
+                    self:addComponent(CoreComponentIds.${Name}, ${Name}Component, '${Name}')
+                else
+                    self:removeComponent(CoreComponentIds.${Name})
+                end
+            end
+            return self
+        end,
+    %endif
+%endfor
+}
 
-local function getComponent(pool, componentClass)
-    local component
-    if pool:size() > 0 then
-        component = pool:removeLast()
-    else
-        component = componentClass:new()
-    end
-    return component
-end
+local entity_component_getters = {
+    %for Name in components:
+        %if components[Name] == False:
+        is${Name} = boolEntityPropertyMt['is${Name}'],
+        %endif
+    %endfor
+}
 
 
+local entity_component_setters = {
+    %for Name in components:
+        %if components[Name] == False:
+        is${Name} = boolEntityPropertyMt['set${Name}'],
+        %endif
+    %endfor
+}
+Entity.Init(boolEntityPropertyMt, entity_component_getters, entity_component_setters)
 
 %for Name in components:
     <%
@@ -77,13 +106,13 @@ function ${Name}Component:new()
 end
 
 ---@type ${namespace}.Bag
-local _${Name}CP = Bag:new()
+local _${Name}ComponentPool = Bag:new()
 for i=1,${config['alloc']['components']} do
-  _${Name}CP:add(${Name}Component:new())
+  _${Name}ComponentPool:add(${Name}Component:new())
 end
 
-function Entity:clear${Name}CP()
-    _${Name}CP:clear()
+function Entity:clear${Name}ComponentPool()
+    _${Name}ComponentPool:clear()
 end
 
 ---@return boolean
@@ -96,7 +125,12 @@ end
         %endfor
 ---@returns ${namespace}.Entity
 function Entity:add${Name} (${params(properties)})
-    local component = getComponent(_${Name}CP, ${Name}Component)
+    local component
+    if _${Name}ComponentPool:size() > 0 then
+        component = _${Name}ComponentPool:removeLast()
+    else
+        component = ${Name}Component:new()
+    end
         %for p in properties:
     component.${p.split(':')[0]} = ${p.split(':')[0]};
         %endfor
@@ -106,18 +140,23 @@ function Entity:add${Name} (${params(properties)})
 end
 
 function Entity:replace${Name} (${params(properties)})
+    local pool = _${Name}ComponentPool
     local previousComponent
     if self:has${Name}() then
         previousComponent = self.${name}
     end
-    local component = getComponent(_${Name}CP, ${Name}Component)
+    local component
+    if _${Name}ComponentPool:size() > 0 then
+        component = pool:removeLast()
+    else
+        component = ${Name}Component():new()
+    end
     %for p in properties:
     component.${p.split(':')[0]} = ${p.split(':')[0]}
     %endfor
-    self.${name} = component
     self:replaceComponent(CoreComponentIds.${Name}, component, '${Name}')
     if (previousComponent ~= nil) then
-        _${Name}CP:add(previousComponent)
+        pool:add(previousComponent)
     end
     return self
 end
@@ -125,27 +164,9 @@ end
 function Entity:remove${Name} (${params(properties)})
     local component = self.${Name}
     self:removeComponent(CoreComponentIds.${Name})
-    ${namespace}._${Name}CP:add(component)
+    ${namespace}._${Name}ComponentPool:add(component)
     return self
 end
-    %else:
----@return Entity
-function Entity:set${Name}(v)
-    if (v ~= self:has${Name}()) then
-        if (v) then
-            self:addComponent(CoreComponentIds.${Name}, ${Name}Component, '${Name}')
-        else
-            self:removeComponent(CoreComponentIds.${Name})
-        end
-    end
-    return self
-end
-
----@return boolean
-function Entity:has${Name}()
-  return self:hasComponent(CoreComponentIds.${Name})
-end
-
     %endif
 
 %endfor
@@ -183,6 +204,63 @@ Matcher.Init(CoreComponentIds)
 %endfor
 local Pool = ${namespace}.Pool
 
+
+## Pooled, getter, setter\
+local Pool_Mt = {
+%for Name in entities:
+<%
+    properties = components[Name]
+%>
+    get${Name} = function(self)
+        return _Pool:getGroup(Matcher.${Name}):getSingleEntity()
+    end,
+    get${Name}Component = function(self)
+        return _Pool:getGroup(Matcher.${Name}):getSingleEntity().${Name}
+    end,
+    has${Name} = function(self)
+        return _Pool:getGroup(Matcher.${Name}):getSingleEntity() ~= nil
+    end,
+    set${Name} = function(self, v)
+        local entity = self.${Name}
+        if (v ~= (entity ~= nil)) then
+            if (v) then
+                _Pool:createEntity(${Name}).is${Name} = true
+            else
+                _Pool:destroyEntity(entity)
+            end
+        end
+        return self
+    end,
+%endfor
+}
+
+local pool_component_getters = {
+    %for Name in entities:
+        <%
+            name =  Name[0].lower() + Name[1:]
+        %>
+        %if components[Name] == False:
+        is${Name} = Pool_Mt['has${Name}'],
+        %else:
+        ${Name}Entity = Pool_Mt['get${Name}'],
+        ${name} = Pool_Mt['get${Name}Component'],
+        %endif
+    %endfor
+}
+
+
+local pool_component_setters = {
+    %for Name in entities:
+        %if components[Name] == False:
+        is${Name} = Pool_Mt['set${Name}'],
+        %else:
+        ${Name}Entity = Pool_Mt['set${Name}'],
+        %endif
+    %endfor
+}
+
+Pool.Init(Pool_Mt, pool_component_getters, pool_component_setters)
+
 %for Name in entities:
 <%
 pooled = entities[Name]
@@ -190,82 +268,43 @@ pooled = entities[Name]
     %if pooled:
 <%
     properties = components[Name]
-    name =  Name[0].lower() + Name[1:]
-
 %>
         %if components[Name] is not False:
             %for p in properties:
 ---@param {${p.split(':')[1]}} ${p.split(':')[0]}"
             %endfor
----@returns Entity
+---@returns ${namespace}.Entity
 function Pool:set${Name}(${params(properties)})
     if (self:has${Name}()) then
         error(Matcher.${Name})
     end
     local entity = self:createEntity('${Name}')
-    self.${name}Entity = entity
-    local component = getComponent(_${Name}CP, ${Name}Component)
-        %for p in properties:
-    component.${p.split(':')[0]} = ${p.split(':')[0]};
-        %endfor
-    self.${name} = component
-    entity.${name} = component
-    entity:addComponent(CoreComponentIds.${Name}, component, '${Name}')
+    entity:add${Name}(${params(properties)})
     return entity
 end
                 %for p in properties:
 ---@param {${p.split(':')[1]}} ${p.split(':')[0]}"
                 %endfor
----@returns Entity
+---@returns ${namespace}.Entity
 function Pool:replace${Name}(${params(properties)})
-    local entity = self.${name}Entity
+    local entity = self.${Name}Entity
     if (entity == nil) then
         entity = self:set${Name}(${params(properties)})
     else
-        local previousComponent = entity.${name}
-        local component = getComponent(_${Name}CP, ${Name}Component)
-        %for p in properties:
-        component.${p.split(':')[0]} = ${p.split(':')[0]}
-        %endfor
-        entity.${name} = component
-        self.${name} = component
-        entity:replaceComponent(CoreComponentIds.${Name}, component, '${Name}')
-        _${Name}CP:add(previousComponent)
-
+        entity:replace${Name}(${params(properties)})
+        return entity
     end
-    return entity
 end
 
----@return bool
 function Pool:has${Name}()
     return self:getGroup(Matcher.${Name}):getSingleEntity() ~= nil
 end
 
+---@returns ${namespace}.Entity
 function Pool:remove${Name}()
-    local old = self.${name}Entity
-    self.${name}Entity = nil
-    self.${name} = nil
-    self:destroyEntity(old)
-end
-        %else:
----@return bool
-function Pool:has${Name}()
-    return self:getGroup(Matcher.${Name}):getSingleEntity() ~= nil
-end
-
----@return Pool
-function Pool:set${Name}(value)
-    if (v ~= self:has${Name}()) then
-        if (v) then
-            self:addComponent(CoreComponentIds.${Name}, ${Name}Component, '${Name}')
-        else
-            self:removeComponent(CoreComponentIds.${Name})
-        end
-    end
-    return self
+    self:destroyEntity(self.${Name}Entity)
 end
         %endif
-
     %endif
 %endfor
 

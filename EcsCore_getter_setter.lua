@@ -52,9 +52,6 @@ end
 
 function Utils.class( tDerived, ... )
     local arg = {...}
-    --local tDerived = tDerived
-    --tDerived.__className = className
-    -- 这里是把所有的基类放到 tDerived.__tbl_Bseclass__ 里面
     tDerived.__tbl_Baseclass__ =  {}
     tDerived.__base = arg[1]
     for index = 1, #arg do
@@ -63,24 +60,18 @@ function Utils.class( tDerived, ... )
         for i = 1, #tBaseClass.__tbl_Baseclass__ do
             table.insert(tDerived.__tbl_Baseclass__, tBaseClass.__tbl_Baseclass__[i])
         end
-        --for key, value in pairs(tBaseClass.__cname) do
-        --    tDerived.__cname[tostring(key)] = value
-        --end
     end
 
-    -- 所有对实例对象的访问都会访问转到tDerived上
     local InstanceMt =  { __index = tDerived }
 
-    --构造函数参数的传递，只支持一层, 出于动态语言的特性以及性能的考虑
     tDerived.new = function( self, ... )
         local NewInstance = {}
-        NewInstance.__ClassDefine__ = self    -- IsType 函数的支持由此来
+        NewInstance.__ClassDefine__ = self   
 
         NewInstance.IsClass = function( self, classtype )
             return self.__ClassDefine__:IsClass(classtype)
         end
 
-        -- 这里要放到调用构造函数之前，因为构造函数里面，可能调用基类的成员函数或者成员变量
         setmetatable( NewInstance, InstanceMt )
         NewInstance.__index = tDerived
         local funcCtor = rawget(self, "Ctor")
@@ -354,6 +345,55 @@ local Entity = Utils.class({
     __setproperty = nil
 })
 
+function Entity.Init(property, getproperty, setproperty)
+    Entity.__property = property
+    Entity.__getproperty = getproperty
+    Entity.__setproperty = setproperty
+end
+
+---@return _Entity
+function Entity:new(...)
+    local __getproperty = Entity.__getproperty
+    local __setproperty = Entity.__setproperty
+    local property = setmetatable({}, {__index = Entity.__property})
+    local mt = {
+        __index = Entity
+    }
+    local Ins = setmetatable({}, mt)
+    Ins:Ctor(...)
+    local ids = Ins._componentsEnum
+    if Entity.__property then
+        mt.__index = function(t,k)
+            local val =  rawget(t, k)
+            if val then
+                return val
+            end
+
+            if __getproperty[k] then
+                local ret = __getproperty[k]
+                if ret then
+                    return ret(Ins)
+                end
+            end
+            --print("get not prop", k, v )
+            return Entity[k]
+        end
+
+        mt.__newindex = function(t,k,v)
+            local setfun =__setproperty[k]
+            if setfun then
+                --print("set prop", k, v )
+                setfun(Ins,v)
+            else
+                --print("set not prop", k, v )
+                rawset(Ins, k,v)
+            end
+        end
+    end
+
+    return Ins
+end
+
 function Entity:CreationIndex()
     return self._creationIndex;
 end
@@ -501,7 +541,7 @@ end
 function Entity:getComponentIndices()
     if self._componentsCache == nil then
         local indices = {}
-        local _components = self._components
+        local _components = this._components
         local j = 0
         for i = 0, #_components do
             local component = _components[i]
@@ -731,7 +771,7 @@ function Group:addEntitySilently(entity)
     if not self._entities[entity.id ] then
         self._entities[entity.id] = entity
         self._entitiesCache = nil
-        self._signalEntityCache = nil
+        self._SignalEntityCache = nil
         entity:addRef()
     end
 end
@@ -740,7 +780,7 @@ function Group: addEntity(entity, index, component)
     if not self._entities[entity.id ] then
         self._entities[entity.id] = entity
         self._entitiesCache = nil
-        self._signalEntityCache = nil
+        self._SignalEntityCache = nil
         entity:addRef()
         local onEntityAdded= self.onEntityAdded
         if (onEntityAdded.active)then
@@ -753,7 +793,7 @@ function Group: removeEntitySilently(entity)
     if self._entities[entity.id ] then
         self._entities[entity.id] = nil
         self._entitiesCache = nil
-        self._signalEntityCache = nil
+        self._SignalEntityCache = nil
         entity:release()
     end
 end
@@ -763,7 +803,7 @@ function Group: removeEntity(entity, index, component)
 
         self._entities[entity.id] = nil
         self._entitiesCache = nil
-        self._signalEntityCache = nil
+        self._SignalEntityCache = nil
         local onEntityRemoved= self.onEntityRemoved
         if (onEntityRemoved.active)then
             onEntityRemoved:dispatch(self, entity, index, component)
@@ -792,18 +832,18 @@ function Group:getEntities()
 end
 
 function Group:getSingleEntity()
-    if (self._signalEntityCache == nil) then
+    if (self._SignalEntityCache == nil) then
         local enumerator = Utils.Keys(self._entities)
         local c = #enumerator
         if (c == 1) then
-            self._signalEntityCache = self._entities[enumerator[1]]
+            self._SignalEntityCache = self._entities[enumerator[1]]
         elseif (c == 0) then
             return nil
         else
-            error("Single Entity has more Entity")
+            --throw new SignalEntityException(self._matcher)
         end
     end
-    return self._signalEntityCache
+    return self._SignalEntityCache
 end
 
 function Group:toString()
@@ -932,7 +972,7 @@ end
 
 ---@class _Pool
 ---@field _reusableEntities Bag
-local Pool = Utils.class({
+local Pool = {
     _entities = {},
     _groups = {},
     _debug = false,
@@ -941,12 +981,62 @@ local Pool = Utils.class({
     __property = nil,
     __getproperty= nil,
     __setproperty = nil,
-})
+}
+---@private
+function Pool.Init(property, getproperty, setproperty)
+    Pool.__property = property
+    Pool.__getproperty = getproperty
+    Pool.__setproperty = setproperty
+end
+
+---@private
+function Pool:new(...)
+    local get = Pool.__getproperty
+    local set = Pool.__setproperty
+    local property = setmetatable({}, {__index = Pool.__property})
+    local mt = {
+        __index = Pool
+    }
+    local Ins = setmetatable({}, mt)
+    Ins:Ctor(...)
+    local ids = Ins._componentsEnum
+
+    if Pool.__property then
+
+        mt.__index = function(t,k)
+            local val =  rawget(t, k)
+            if val then
+                return val
+            end
+
+            if get[k] then
+                local ret = get[k]
+                if ret then
+                    return ret(property)
+                end
+            end
+            --print("get not prop", k, v )
+            return Pool[k]
+        end
+
+        mt.__newindex = function(t,k,v)
+            if ids[k] then
+                --print("set prop", k, v )
+                set(property,v)
+            else
+                --print("set not prop", k, v )
+                rawset(t, k,v)
+            end
+        end
+    end
+
+    return Ins
+end
 
 ---@private
 function Pool:Ctor(components, totalComponents, debug, startCreationIndex)
     startCreationIndex = startCreationIndex or 0
-    Pool.instance = self
+    Pool.instance = this
     self.onGroupCreated = Signal:new()
     self.onEntityCreated = Signal:new()
     self.onEntityDestroyed = Signal:new()
@@ -1084,27 +1174,27 @@ function Pool:getGroup(matcher)
         group = self._groups[matcher.id]
     else
         group = Group:new(matcher)
+    end
 
-        local entities = self:getEntities()
-        local len = #entities
-        for i = 1, len do
-            group:handleEntitySilently(entities[i])
+    local entities = self:getEntities()
+    local len = #entities
+    for i = 1, len do
+        group:handleEntitySilently(entities[i])
+    end
+    self._groups[matcher.id] = group
+    local Indices = matcher:getIndices()
+    local inLen = #Indices
+    for i = 1 , inLen do
+        local index = Indices[i]
+        if (self._groupsForIndex[index] == nil) then
+            self._groupsForIndex[index] = Bag:new()
         end
-        self._groups[matcher.id] = group
-        local Indices = matcher:getIndices()
-        local inLen = #Indices
-        for i = 1 , inLen do
-            local index = Indices[i]
-            if (self._groupsForIndex[index] == nil) then
-                self._groupsForIndex[index] = Bag:new()
-            end
-            self._groupsForIndex[index]:add(group)
-        end
+        self._groupsForIndex[index]:add(group)
+    end
 
-        local onGroupCreated = self.onGroupCreated
-        if (onGroupCreated.active) then
-            onGroupCreated:dispatch(self. group)
-        end
+    local onGroupCreated = self.onGroupCreated
+    if (onGroupCreated.active) then
+        onGroupCreated:dispatch(self. group)
     end
 
     return group
@@ -1117,6 +1207,7 @@ function Pool:updateGroupsComponentAddedOrRemoved  (entity, index, component)
         local count = groups:size()
         for i = 1, count do
             groups[i]:handleEntity(entity, index, component)
+
         end
     end
 end
@@ -1213,7 +1304,7 @@ function Matcher:matches(entity)
         matchesAnyOf = entity:hasAnyComponent(self._anyOfIndices)
     end
     if self._noneOfIndices ~= nil then
-        matchesNoneOf = not entity:hasAnyComponent(self._noneOfIndices)
+        matchesNoneOf = not entity.hasAnyComponent(self._noneOfIndices)
     end
     return matchesAllOf and matchesAnyOf and matchesNoneOf
 end
@@ -1243,7 +1334,7 @@ function Matcher:toString()
         end
         if (self._anyOfIndices ~= nil) then
             if (self._allOfIndices ~= nil) then
-                table.insert(sb, '.')
+                sb[sb.length] = '.'
             end
             Matcher.appendIndices(sb, "AnyOf", self._anyOfIndices)
         end
@@ -1324,13 +1415,12 @@ end
 ---@private
 function Matcher.appendIndices(sb, prefix, indexArray)
     local SEPERATOR = ", "
-    local j = #sb
-
+    local j = sb.length
     sb[j] = prefix
     j = j + 1
     sb[j] = '('
     j = j + 1
-    local lastSeperator = #indexArray - 1
+    local lastSeperator = indexArray.length - 1
     local len = #indexArray
     for i = 1, len do
         sb[j] = ''+indexArray[i]

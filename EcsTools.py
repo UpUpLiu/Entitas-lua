@@ -24,13 +24,13 @@ def gen_lua_code():
     with open(config_path, 'r') as load_f:
         load_dict = json.load(load_f)
 
-    template = Template(filename=current_path + "/mako/ecs_lua_performance.mako",
-                        module_directory= os.path.join(current_path ,'makoCache'))
+    template = Template(filename=current_path + "/mako/ecs_lua.mako")
     file = open_file(os.path.join(os.path.join(entitas_config_dir, load_dict['output']) ,  "GenerateEcsCore.lua") , 'w')
     content = template.render(config = load_dict)
     content = content.replace('\n','')
     file.write(content)
     file.close()
+    print("gencode filish")
 
 if __name__ == "__main__":
     main()

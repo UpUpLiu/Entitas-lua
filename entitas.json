@@ -8,9 +8,16 @@
 	},
 	"components": {
 		"Movable": false,
+		"Asset" :[
+			"value:string"
+		],
+        "AssetObject": [
+          "value:GameObject"
+        ],
 		"Position": [
 			"x:number",
-			"y:number"
+			"y:number",
+            "z:number"
 		],
 		"FramePosition": [
 			"x:number",
@@ -25,17 +32,14 @@
 		
 		"ResetGameBoard": false,
 		"GameBoardCache": [
-			"grid:Array<Array<Entity>>",
-			"gridTypeArray: {[key:number] : {[key:number] : Entity}}",
-			"gridTypeLength: any"
+			"grid:Entity[][][]"
 		],
 		"ViewGrid": [
-			"value: {[key:number] : {[key:number] : Entity}}"
+			"value: Entity[][]"
 		],
 		"ViewPos": [
 			"x : number",
 			"y : number"
-		
 		],
 		"Angle": [
 			"value : number"
@@ -52,21 +56,21 @@
 			"columns : number",
 			"levelConfig:Config.LevelMapConfig"
 		],
-		"GameBoardElement": false,
+		"Element": false,
 		"ElementConfig": [
 			"config : Config.Element"
 		],
 		"MoveTween": [
-			"posArray : Array<Laya.Point>"
+			"posArray : Point[]"
 		],
 		"Input": [
 			"x:number",
 			"y:number",
-			"touchType: WeGame.TouchType"
+			"touchType: TouchType"
 		],
 		"Link": [
-			"linkArray:Array<Entity>",
-			"gridType:WeGame.GridType"
+			"linkArray:Entity[]",
+			"gridType:GridType"
 		
 		],
 		"CheckCanEliminate": false,
@@ -79,9 +83,6 @@
 		"Interactive": false,
 		"Resource": [
 			"name:string"
-		],
-		"View": [
-			"sprite:any"
 		],
 		"Score": [
 			"value:number"
@@ -101,10 +102,10 @@
 		"ElementDiedRecord": [],
 		"MonsterDiedRecord": [],
 		"MapRecord": [
-			"value : {[key:number] : number}"
+			"value : number[]"
 		],
 		"Monster": [
-			"config : Config.MonsterConfig"
+			"config : MonsterConfig"
 		],
 		"IdComponent": [
 			"value: number"
@@ -112,10 +113,10 @@
 		"Moving": false,
 		"ElementFrame": false,
 		"ElementFrameConfig": [
-			"value : Config.ElementFrame"
+			"value : ElementFrame"
 		],
 		"ElementFrameBoardCache": [
-			"value:Array<Array<Array<Entity>>>"
+			"value:Entity[][][]"
 		]
 	},
 	"systems": {
@@ -158,7 +159,7 @@
 				"viewPosy:number"
 			],
 			"createElementFrame:Entity": [
-				"frameData:Config.LineData"
+				"frameData: LineData"
 			],
 			"createBlocker:Entity": [
 				"x:number",
@@ -172,17 +173,17 @@
 			],
 			"removeAll:void": [],
 			"removeSame:void": [
-				"gridType:WeGame.GridType"
+				"elementType:ElementType"
 			],
 			
 			"ShuffleGamebord:void": [],
 			"createEmptyEntity : Entity": []
 		},
 		"Entity": {
-			"getFourNeighbor:Array<Entity>": [
-				"grid:Array<Array<Entity>>"
+			"getFourNeighbor:Entity[]": [
+				"grid:Entity[][]"
 			],
-			"getDirection:WeGame.FrameIndex": [
+			"getDirection:FrameIndex": [
 				"x:number",
 				"y:number"
 			]
