@@ -19,10 +19,6 @@ entitas.json为Ecs的生成配置，  这是一个简单的示例。
 与Entitas-csharp 最大的不同为 lua中没有getter， setter的功能， 我有一个老版本的使用 metatable 的方式模拟了getter和setter的操作。 
 这个版本已经是可以正常使用。 
 但是后面放弃了模拟getter，setter的方式， 因为这样会严重拖慢性能。 所以就在易用性上面做了一些妥协。
-然后没有csharp中不同Contexts的概念  和  打标签生成唯一键值索引的方法。
-
-这2个都是可以通过代码生成达到效果。 但是我可能没有时间进行这个优化。
-
 
 # 最后
 
@@ -32,3 +28,5 @@ entitas.json为Ecs的生成配置，  这是一个简单的示例。
 # 测试
 测试环境: lua5.3.4, windows
 测试方法: lua53.exe test_runtime.lua (需要先进行生成)
+
+
