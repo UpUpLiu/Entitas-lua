@@ -78,15 +78,13 @@ function Group:addEntitySilently(entity)
         self._entitiesCache = nil
         self._signalEntityCache = nil
         entity:addRef()
+        return true
     end
+    return false
 end
 
 function Group:addEntity(entity, index, component)
-    if not self._entities[entity.id ] then
-        self._entities[entity.id] = entity
-        self._entitiesCache = nil
-        self._signalEntityCache = nil
-        entity:addRef()
+    if self:addEntitySilently(entity) then
         local onEntityAdded= self.onEntityAdded
         if (onEntityAdded.active)then
             onEntityAdded:dispatch(self, entity, index, component)
@@ -100,20 +98,17 @@ function Group:removeEntitySilently(entity)
         self._entitiesCache = nil
         self._signalEntityCache = nil
         entity:release()
+        return true
     end
+    return false
 end
 
 function Group:removeEntity(entity, index, component)
-    if self._entities[entity.id ] then
-
-        self._entities[entity.id] = nil
-        self._entitiesCache = nil
-        self._signalEntityCache = nil
+    if self:removeEntitySilently(entity) then
         local onEntityRemoved= self.onEntityRemoved
         if (onEntityRemoved.active)then
             onEntityRemoved:dispatch(self, entity, index, component)
         end
-        entity:release()
     end
 end
 

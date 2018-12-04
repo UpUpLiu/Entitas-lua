@@ -124,6 +124,7 @@ GLOBAL.test_noneof_group = function()
     context:destroyAllEntities()
     local noneof_group_record = 0
     local noneof = context:getGroup(GameMatcher.AnyOf( GameMatcher.Element, GameMatcher.Asset):noneOf(GameMatcher.Position))
+    
     local noneof_add = function ()
         noneof_group_record = noneof_group_record + 1
     end
@@ -198,6 +199,7 @@ GLOBAL.test_primary_index = function()
     local next_e = Context:createEntity("test2")
     xpcall(function ()
         next_e:addPosition(PosV3(1,2,3))
+
     end, function ()
         record = record + 1
     end)
@@ -247,7 +249,6 @@ GLOBAL.test_reactivesystem = function()
     ss:execute()
     assert(entity_count == 2)
     Context:destroyEntity(e)
-
 end
 
 GLOBAL.test_10000_entities = function()

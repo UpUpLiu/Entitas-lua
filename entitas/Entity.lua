@@ -219,11 +219,12 @@ function Entity:removeAllComponents()
 end
 
 function Entity:_destroy()
+    self._isEnabled = false
     self:removeAllComponents()
     self.onComponentAdded:clear()
     self.onComponentRemoved:clear()
     self.onComponentReplaced:clear()
-    self._isEnabled = false
+    --print("我被标记为enable false", self)
 end
 
 function Entity:tostring()
@@ -244,7 +245,7 @@ function Entity:release()
         end
         self.onEntityReleased:clear()
     elseif self._refCount < 0 then
-        error("Entity is Released")
+        --error("Entity is Released")
     end
 end
 
