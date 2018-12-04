@@ -1,192 +1,141 @@
 {
-	"namespace": "Entitas",
-	"src": "src/ecs",
-	"output": "",
-	"alloc": {
-		"entities": 32,
-		"components": 16
+	"namespace":"Entitas",
+	"src":"src/ecs",
+	"output":"",
+	"alloc":{
+		"entities":32,
+		"components":16
 	},
-	"components": {
-		"Movable": false,
-		"Asset" :[
-			"value:string"
-		],
-        "AssetObject": [
-          "value:GameObject"
-        ],
-		"Position": [
-			"x:number",
-			"y:number",
-            "z:number"
-		],
-		"FramePosition": [
-			"x:number",
-			"y:number",
-			"frameIndex:WeGame.FrameIndex"
-		],
-		"GridType": [
-			"gridType:WeGame.GridType"
-		],
-		"Destroy": false,
-		"UnNormalDestroy": false,
-		
-		"ResetGameBoard": false,
-		"GameBoardCache": [
-			"grid:Entity[][][]"
-		],
-		"ViewGrid": [
-			"value: Entity[][]"
-		],
-		"ViewPos": [
-			"x : number",
-			"y : number"
-		],
-		"Angle": [
-			"value : number"
-		],
-		"SortOrder": [
-			"value : number"
-		],
-		"Scale": [
-			"value : number"
-		],
-		"GameBoard": [
-			"levelName:string",
-			"rows : number",
-			"columns : number",
-			"levelConfig:Config.LevelMapConfig"
-		],
-		"Element": false,
-		"ElementConfig": [
-			"config : Config.Element"
-		],
-		"MoveTween": [
-			"posArray : Point[]"
-		],
-		"Input": [
-			"x:number",
-			"y:number",
-			"touchType: TouchType"
-		],
-		"Link": [
-			"linkArray:Entity[]",
-			"gridType:GridType"
-		
-		],
-		"CheckCanEliminate": false,
-		"Linked": [
-			"index:number"
-		],
-		"Health": [
-			"hp : number"
-		],
-		"Interactive": false,
-		"Resource": [
-			"name:string"
-		],
-		"Score": [
-			"value:number"
-		],
-		"Item": [
-			"itemId:number",
-			"itemNum:number"
-		],
-		"ItemUse": false,
-		"ItemUsePos": [
-			"posX : number",
-			"posY : number"
-		],
-		"TimeRecord": [
-			"Value : number"
-		],
-		"ElementDiedRecord": [],
-		"MonsterDiedRecord": [],
-		"MapRecord": [
-			"value : number[]"
-		],
-		"Monster": [
-			"config : MonsterConfig"
-		],
-		"IdComponent": [
-			"value: number"
-		],
-		"Moving": false,
-		"ElementFrame": false,
-		"ElementFrameConfig": [
-			"value : ElementFrame"
-		],
-		"ElementFrameBoardCache": [
-			"value:Entity[][][]"
-		]
-	},
-	"systems": {
-		"DestroySystem": true,
-		"FallSystem": true,
-		"FillSystem": true,
-		"CreateGameBoardCacheSystem": true,
-		"GameBoardSystem": true,
-		"ProcessInputSystem": true,
-		"RenderPositionSystem": true,
-		"AddViewSystem": true,
-		"RemoveViewSystem": true,
-		"ScoreSystem": true,
-		"LinkSystem": true,
-		"CheckCanEliminateSystem": true,
-		"ItemSystem": true,
-		"TimeRecordSystem": true,
-		"ElementDiedSystem": true,
-		"ElementFrameBoardCacheSystem": true
-	},
-	"entities": {
-		"GameBoardCache": true,
-		"GameBoard": true,
-		"ViewGrid": true,
-		"ResetGameBoard": true,
-		"Score": true,
-		"Link": true,
-		"Item": true,
-		"TimeRecord": true,
-		"ElementDiedRecord": true,
-		"MonsterDiedRecord": true,
-		"ElementFrameBoardCache": true
-	},
-	"extensions": {
-		"Pool": {
-			"createRandomPiece:Entity": [
-				"x:number",
-				"y:number",
-				"viewPosx:number",
-				"viewPosy:number"
-			],
-			"createElementFrame:Entity": [
-				"frameData: LineData"
-			],
-			"createBlocker:Entity": [
-				"x:number",
-				"y:number"
-			],
-			"removeRow:void": [
-				"y:number"
-			],
-			"removeColumn:void": [
-				"x:number"
-			],
-			"removeAll:void": [],
-			"removeSame:void": [
-				"elementType:ElementType"
-			],
-			
-			"ShuffleGamebord:void": [],
-			"createEmptyEntity : Entity": []
+	"contexts":{
+		"game":{
+			"components":{
+				"IdComponent":[
+					"value:number"
+				],
+				"Movable":false,
+				"Element":false,
+				"Moving":false,
+				"ElementFrame":false,
+				"Interactive":false,
+				"Destroy":false,
+				"Asset":[
+					"value:string"
+				],
+				"AssetObject":[
+					"obj:UnityEngine.GameObject",
+					"trans:UnityEngine.Transform"
+				],
+				"Position":[
+					"value:PosV3"
+				],
+				"ViewPos":[
+					"value:PosV2"
+				],
+				"FrameIndex":[
+					"value:FrameIndex"
+				],
+				"ElementType":[
+					"value:ElementType"
+				],
+				"DestroyType":[
+					"value:DestroyType"
+				],
+				"ResetGameBoard":false,
+				"Angle":[
+					"value:number"
+				],
+				"Scale":[
+					"value:number"
+				],
+				"GameBoard":[
+					"levelName:string",
+					"height:number",
+					"width:number",
+					"levelConfig:Config.LevelMapConfig"
+				],
+				"ElementConfig":[
+					"config:Config.Element"
+				],
+				"MoveList":[
+					"value:PosV2[]"
+				],
+				"Input":[
+					"x:number",
+					"y:number",
+					"touchType:TouchType"
+				],
+				"LinkList":[
+					"list:GameEntity[]",
+					"elementType:ElementType"
+				],
+				"BoardState":[
+					"value:BoardState"
+				],
+				"Linked":[
+					"index:number"
+				],
+				"Health":[
+					"hp:number"
+				],
+				"Score":[
+					"value:number"
+				],
+				"Item":[
+					"itemId:number",
+					"itemNum:number"
+				],
+				"ItemUse":false,
+				"ItemUsePos":[
+					"posX:number",
+					"posY:number"
+				],
+				"TimeRecord":[
+					"Value:number"
+				],
+				"MapRecord":[
+					"value:number[]"
+				],
+				"ElementFrameConfig":[
+					"value:ElementFrame"
+				]
+			},
+			"entities":{
+				"GameBoard":true,
+				"ResetGameBoard":true,
+				"Score":true,
+				"LinkList":true,
+				"Item":true,
+				"TimeRecord":true
+			},
+			"indexes":{
+				"primary":{
+					"Position":[
+						"value:PosV3"
+					]
+				},
+				"index":{
+					"ElementType":[
+						"value:ElementType"
+					],
+					"ViewPos":[
+						"value:PosV2"
+					]
+				}
+			}
 		},
-		"Entity": {
-			"getFourNeighbor:Entity[]": [
-				"grid:Entity[][]"
-			],
-			"getDirection:FrameIndex": [
-				"x:number",
-				"y:number"
-			]
+		"gameState":{
+			"components":{
+				"Socores":[
+					"value:number"
+				],
+				"TestState":[
+					"value:number"
+				]
+			},
+			"entities":{
+				"TestState":true
+			}
 		}
 	}
+
 }

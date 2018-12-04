@@ -1,12 +1,10 @@
 from mako.template import Template
 import json
 import os
-import stat
 import codecs
-
-entitas_config_dir = os.path.normpath(os.path.split(os.path.realpath(__file__))[0])
+import stat
 def main():
-    gen_lua_code()
+    test()
 
 def open_file(fullname, mode, encoding=None):
     if not os.path.exists(os.path.dirname(fullname)):
@@ -16,21 +14,28 @@ def open_file(fullname, mode, encoding=None):
         os.chmod(fullname, stat.S_IWUSR | stat.S_IWGRP | stat.S_IWOTH | stat.S_IRUSR | stat.S_IRGRP | stat.S_IROTH)
     return codecs.open(fullname, mode, encoding)
 
-def gen_lua_code():
-    
+def test():
     current_path = os.path.normpath(os.path.split(os.path.realpath(__file__))[0])
+    entitas_config_dir = current_path
     config_path = os.path.join(entitas_config_dir, "entitas.json")
 
     with open(config_path, 'r') as load_f:
-        load_dict = json.load(load_f)
+        text = load_f.read()
+        text = text.replace(' ','')
+        load_dict = json.loads(text)
 
-    template = Template(filename=current_path + "/mako/ecs_lua.mako")
-    file = open_file(os.path.join(os.path.join(entitas_config_dir, load_dict['output']) ,  "GenerateEcsCore.lua") , 'w')
+
+    template = Template(filename=current_path + "/mako/ecs_lua_performance.mako",
+                        module_directory= os.path.join(current_path ,'makoCache'))
+    file_name = os.path.join(os.path.join(entitas_config_dir, load_dict['output']), "GenerateEcsCore.lua") 
+    file = open_file(file_name , 'w')
+    print(file_name)
     content = template.render(config = load_dict)
     content = content.replace('\n','')
     file.write(content)
     file.close()
-    print("gencode filish")
+    print("gen entitas code success")
+
 
 if __name__ == "__main__":
     main()

@@ -4,6 +4,6 @@
 --- DateTime: 2018-11-27 23:18
 ---
 
-Entitas = require("EcsCore")
+Entitas = require("entitas")
 require("GenerateEcsCore")
 Matcher = Entitas.Matcher
