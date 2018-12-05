@@ -22,7 +22,7 @@ entitas.json为Ecs的生成配置，  这是一个简单的示例。
 这个版本已经是可以正常使用。 
 但是后面放弃了模拟getter，setter的方式， 因为这样会严重拖慢性能。 所以就在易用性上面做了一些妥协。
 
-如果需要查看一些使用文档， 建议查看原始C#[Entitas C# Wiki](https://github.com/sschmid/Entitas-CSharp/wiki)版本，因为该实现与原始实现基本是一致的
+如果需要查看一些使用文档， 建议查看原始版本[Entitas C# Wiki](https://github.com/sschmid/Entitas-CSharp/wiki)，因为该实现与原始实现基本是一致的
 
 
 配置说明:
