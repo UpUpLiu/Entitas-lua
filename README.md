@@ -24,6 +24,7 @@ entitas.json为Ecs的生成配置，  这是一个简单的示例。
 
 
 配置说明:
+~~~
   "contexts":{    每一个contexts代表一个上下文。（和C#版本的新增一个Attribute一样）
 		"game":{      context的名字
 			"components":{    该context的组件列表
@@ -62,7 +63,7 @@ entitas.json为Ecs的生成配置，  这是一个简单的示例。
     "gameState":{
       ...     其他Context
     }
-
+~~~
 # 最后
 
 我自己的项目是会持续使用， 并且会在之后的上传简单的Unity例子工程
