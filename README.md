@@ -26,40 +26,41 @@ entitas.json为Ecs的生成配置，  这是一个简单的示例。
 配置说明:
 ~~~
   "contexts":{    每一个contexts代表一个上下文。（和C#版本的新增一个Attribute一样）
-		"game":{      context的名字
-			"components":{    该context的组件列表
-				"IdComponent":[   组件的名字
-					"value:number"  组件的属性名：组件的属性的类型（类型会用于代码提示）
-				],
-				"Movable":false,  组件名字：false  如果该组件没有属性， 那么就是一个简单的falg属性， 固定写法 false
-        			"GameBoard":[     组件名字
-					"levelName:string",    组件的属性名：组件的属性的类型（组件属性可以有多个）
-					"height:number",       组件的属性名：组件的属性的类型
-					"width:number",
-					"levelConfig:Config.LevelMapConfig"
-				],
-        "ElementType":[
-              "value:ElementType"
-        ],
-      "entities":{    唯一组件列表， 组件必须要线进行预先配置才能当作唯一组件
-        "GameBoard":true,   组件名字：true（固定写法）   标识这个组件会是一个唯一组件.会在Context下生成API
-      },
-      "indexes":{     组件索引列表， 组件必须要线进行预先配置才能当作索引（建立索引的时机是实时的）
-        "primary":{   唯一键值索引     框架会自动生成以该值为唯一键值索引的代码， 如果重复添加会报错
-          "IdComponent":[
-            "value:number"
-          ]
-        },
-        "index":{    不唯一键值索引    框架会自动生成以该值作为键值索引的代码， 会提供通过键值获取列表的API
-          "ElementType":[
-            "value:ElementType"
-          ],
-          "ViewPos":[
-            "value:PosV2"
-          ]
-        }
-      }
-    ],
+	"game":{      context的名字
+		"components":{    该context的组件列表
+			"IdComponent":[   组件的名字
+				"value:number"  组件的属性名：组件的属性的类型（类型会用于代码提示）
+			],
+			"Movable":false,  组件名字：false  如果该组件没有属性， 那么就是一个简单的falg属性， 固定写法 false
+			"GameBoard":[     组件名字
+				"levelName:string",    组件的属性名：组件的属性的类型（组件属性可以有多个）
+				"height:number",       组件的属性名：组件的属性的类型
+				"width:number",
+				"levelConfig:Config.LevelMapConfig"
+			],
+			"ElementType":[
+			  "value:ElementType"
+			 ],
+			"entities":{    唯一组件列表， 组件必须要线进行预先配置才能当作唯一组件
+				"GameBoard":true,   组件名字：true（固定写法）   标识这个组件会是一个唯一组件.会在Context下生成API
+			},
+			"indexes":{     组件索引列表， 组件必须要线进行预先配置才能当作索引（建立索引的时机是实时的）
+				"primary":{   唯一键值索引     框架会自动生成以该值为唯一键值索引的代码， 如果重复添加会报错
+				  "IdComponent":[
+				    "value:number"
+				  ]
+				},
+				"index":{    不唯一键值索引    框架会自动生成以该值作为键值索引的代码， 会提供通过键值获取列表的API
+				  "ElementType":[
+				    "value:ElementType"
+				  ],
+				  "ViewPos":[
+				    "value:PosV2"
+				  ]
+				}
+			}
+		}
+	},
     "gameState":{
       ...     其他Context
     }
