@@ -14,7 +14,7 @@
 # 简单说明:
 entitas.json为Ecs的生成配置，  这是一个简单的示例。
 
-配合使用Emmlylua插件为最佳体验， 感谢阿唐为我们提供如此好用的lua插件。（没有Emmlylua插件。。Ecs_lua使用体验会差很多)
+配合使用Emmlylua插件为最佳体验， 感谢阿唐为我们提供如此好用的lua插件。（没有EmmyLua插件。。Ecs_lua使用体验会差很多)
 
 原版本参照Entitas-csharp 和 Entias-ts
 
@@ -65,6 +65,9 @@ entitas.json为Ecs的生成配置，  这是一个简单的示例。
     }
 }
 ~~~
+
+生成出来的lua文件是GenerateEcsCore.lua， 配合使用EmmyLua插件，你会有飞一般的体验， 基本和写静态的语言的感觉是差不多的
+
 # 最后
 
 我自己的项目是会持续使用， 并且会在之后的上传简单的Unity例子工程
