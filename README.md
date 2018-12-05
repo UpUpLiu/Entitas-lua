@@ -1,5 +1,5 @@
 # Entitas-lua
-起因是因为用Entitas写游戏逻辑感觉舒服，但是发现没有lua版本， 这是一个Entitas_Lua实现。
+起因是因为用Entitas写游戏逻辑感觉舒服，但是发现没有lua版本（但其实后来才发现原来是有的， 不过基本都没有做代码生成）， 这是一个Entitas_Lua实现。
 
 
 # 如何安装：
@@ -75,3 +75,8 @@ entitas.json为Ecs的生成配置，  这是一个简单的示例。
 测试方法: lua53.exe test_runtime.lua (需要先进行生成)
 
 
+#TODO:
+1. 与Unity Inspector显示的连接，与监测
+2. 生成API优化 （目前有一些参数传递可能是多余的， 然后所有的ComponentIndex，其实可以全部直接使用数字， 因为既然是生成的API，也不用去考虑可读性）
+3. 考虑实现C#版本Event的标签
+4. 简单的Demo
