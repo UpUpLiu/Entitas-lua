@@ -32,7 +32,7 @@ entitas.json为Ecs的生成配置，  这是一个简单的示例。
 					"value:number"  组件的属性名：组件的属性的类型（类型会用于代码提示）
 				],
 				"Movable":false,  组件名字：false  如果该组件没有属性， 那么就是一个简单的falg属性， 固定写法 false
-        "GameBoard":[     组件名字
+        			"GameBoard":[     组件名字
 					"levelName:string",    组件的属性名：组件的属性的类型（组件属性可以有多个）
 					"height:number",       组件的属性名：组件的属性的类型
 					"width:number",
