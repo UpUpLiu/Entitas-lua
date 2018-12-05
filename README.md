@@ -63,6 +63,7 @@ entitas.json为Ecs的生成配置，  这是一个简单的示例。
     "gameState":{
       ...     其他Context
     }
+}
 ~~~
 # 最后
 
