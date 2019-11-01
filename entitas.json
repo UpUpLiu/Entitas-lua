@@ -8,104 +8,251 @@
 	},
 	"contexts":{
 		"game":{
-			"components":{
-				"IdComponent":[
-					"value:number"
-				],
-				"Movable":false,
-				"Element":false,
-				"Moving":false,
-				"ElementFrame":false,
-				"Interactive":false,
-				"Destroy":false,
-				"Asset":[
-					"value:string"
-				],
-				"AssetObject":[
-					"obj:UnityEngine.GameObject",
-					"trans:UnityEngine.Transform"
-				],
-				"Position":[
-					"value:PosV3"
-				],
-				"ViewPos":[
-					"value:PosV2"
-				],
-				"FrameIndex":[
-					"value:FrameIndex"
-				],
-				"ElementType":[
-					"value:ElementType"
-				],
-				"DestroyType":[
-					"value:DestroyType"
-				],
-				"ResetGameBoard":false,
-				"Angle":[
-					"value:number"
-				],
-				"Scale":[
-					"value:number"
-				],
-				"GameBoard":[
-					"levelName:string",
-					"height:number",
-					"width:number",
-					"levelConfig:Config.LevelMapConfig"
-				],
-				"ElementConfig":[
-					"config:Config.Element"
-				],
-				"MoveList":[
-					"value:PosV2[]"
-				],
-				"Input":[
-					"x:number",
-					"y:number",
-					"touchType:TouchType"
-				],
-				"LinkList":[
-					"list:GameEntity[]",
-					"elementType:ElementType"
-				],
-				"BoardState":[
-					"value:BoardState"
-				],
-				"Linked":[
-					"index:number"
-				],
-				"Health":[
-					"hp:number"
-				],
-				"Score":[
-					"value:number"
-				],
-				"Item":[
-					"itemId:number",
-					"itemNum:number"
-				],
-				"ItemUse":false,
-				"ItemUsePos":[
-					"posX:number",
-					"posY:number"
-				],
-				"TimeRecord":[
-					"Value:number"
-				],
-				"MapRecord":[
-					"value:number[]"
-				],
-				"ElementFrameConfig":[
-					"value:ElementFrame"
-				]
-			},
-			"entities":{
-				"GameBoard":true,
-				"ResetGameBoard":true,
-				"Score":true,
-				"LinkList":true,
-				"Item":true,
-				"TimeRecord":true
+			"components": {
+				"deltaTime" : {
+					"data" :[
+						"value : number"
+					],
+					"single" : true
+				},
+				"Index" : {
+					"data" : [
+						"value : number"
+					]
+				},
+				"sid" : {
+					"data" :[
+						"value : string"
+					],
+					"attr" : {
+						"primaryIndex" :[
+							"value : string "
+						]
+					}
+				},
+				"Player" : {
+					"data" : [
+						"value : model.MainPlayer"
+					],
+					"single" : true
+				},
+				"GameState" : {
+					"data" : [
+						"value : constval.GameState"
+					],
+					"single" : true
+				},
+				"ChangeGameState" : {
+					"data" : [
+						"value : constval.GameState"
+					],
+					"single" : true
+				},
+				"GameStateChanging": {
+					"single" : true
+				},
+				"FireLevel" : {
+					"data" : [
+						"value : model.FireLevel"
+					],
+					"single" : true
+				},
+				"LevelEndTime" : {
+					"data" : [
+						"value : number"
+					],
+					"single": true
+				},
+				"LevelUseTime" : {
+					"data" : [
+						"value : number"
+					],
+					"single": true
+				},
+				"LevelShowText" : {
+					"data" : [
+						"value : string"
+					],
+					"single": true
+				},
+				"StepChangeRecord":{
+					"data" : [
+						"map : {}",
+						"list : []"
+					],
+					"single" : true
+				},
+				"LevelState" : {
+					"data" : [
+						"value : constval.LevelState"
+					],
+					"single":true
+				},
+
+				"ViewComponent" :{
+					"data" :[
+						"value : any"
+					]
+				},
+				"viewEcsName" :{
+					"data" :[
+						"value : string"
+					],
+					"attr":{
+						"primaryIndex" : [
+							"value : string "
+						]
+					}
+				},
+				"CCNode" : {
+					"data" : [
+						"value : cc.Node"
+					]
+				},
+				"FireNum" : {
+					"data": [
+						"index : number",
+						"value : model.FireNumber"
+					],
+					"attr" : {
+						"primaryIndex" : [
+							"index : number "
+						]
+					}
+				},
+				"FireNumNodeList" : {
+					"data" : [
+						"root : cc.Node",
+						"numNodeList : cc.Node[]",
+						"entityList : entitas.Entity[]"
+					]
+				},
+				"FireNumText" :{
+					"data": [
+						"value : string"
+					]
+				},
+				"FireStickData" : {
+					"data" :[
+						"active : boolean"
+					]
+				},
+				"FireStickRightData" : {
+					"data" : [
+						"active : boolean"
+					]
+				},
+				"FireStickParentId" : {
+					"data" :[
+						"value : string",
+						"fireNumIndex : number"
+					],
+					"attr":{
+						"indexs" : [
+							"value : string "
+						]
+					}
+				},
+				"FireStickNode" :{
+					"data" :[
+						"numNode : cc.Node",
+						"darkNode : cc.Node"
+					]
+				},
+				"ViewCommandList" :{
+					"data":[
+						"value : model.ViewCommand[]"
+					],
+					"single" : true
+				},
+				"Input" : false,
+				"Tipping" : true,
+				"Destroy" : false,
+				"ResumeToStart" :{
+					"single" : true
+				},
+
+				"OnClickFireStickNode" : {
+					"data":[
+						"id : string"
+					]
+				},
+				"TipsText" : {
+					"data":[
+						"showText : string"
+					]
+				},
+				"Resume" : {
+					"data" :[
+						"key : string"
+					]
+				},
+				"UseItem" : {
+					"data" : [
+						"value : number"
+					]
+				},
+				"ChangeFireStick" : {
+					"data" : [
+						"sid : string"
+					]
+				},
+				"IsChange":{
+					"data": [
+						"value : boolean"
+					],
+					"attr":{
+						"indexs" : [
+							"value : boolean "
+						]
+					}
+				},
+				"InitGame" :{
+					"single" : true
+				},
+				"GameConfig" :{
+					"data":[
+						"value : Gameconfig"
+					],
+					"single" : true
+				},
+				"GameData" : {
+					"data" : [
+						"value : model.GameData"
+					],
+					"single" : true
+				},
+				"LevelEnd" : {
+					"data" : [
+						"multiple :number"
+					],
+					"single" : true
+				},
+				"wxShare" : {
+					"data" : [
+						"type : number"
+					],
+					"single" : true
+				},
+				"wxShareCallBack" : {
+					"data" : [
+						"resInfo: any",
+						"success: boolean"
+					],
+					"single" : true
+				},
+				"TimeVal" : {
+					"data" :[
+						"value : number"
+					]
+				},
+				"SaveList" : {
+					"data" : [
+						"saveList : Array<string>"
+					]
+				},
+				"SaveTrigger" : false,
+				"RecoverTrigger" :false
 			},
 			"indexes":{
 				"primary":{
