@@ -60,7 +60,7 @@ EntitasConfig路径下的文件为Ecs的生成配置，  这是一个简单的�
       }
 
   工具会自动获取与entitas.lua 同路径下的lua文件, 运行 并检查返回值的Component:
-  return {
+ --- return {
     name ={  --名字
         data = {          如果Component不是标记Component, 那么需要定义data 用于说明变量
             "value : string @ index"  格式为:  变量名 : 注释名字 @ attr | attr .. (目前字段的 attr仅支持 index 和 primaryIndex)
