@@ -39,12 +39,6 @@ EntitasConfig路径下的文件为Ecs的生成配置，  这是一个简单的�
 ![image](https://github.com/UpUpLiu/Entitas-lua/blob/master/document/noTips.gif)
 
 
-# 最后
-
-我自己的项目是会持续使用， 并且会在之后的上传简单的Unity例子工程
-
-如果对于使用lua来做核心战斗有所担心。 其实可以考虑把Entitas的核心部分剥离， 用C或者c++去进行实现。
-
 
 # 测试
 测试环境: lua5.3.4, windows
