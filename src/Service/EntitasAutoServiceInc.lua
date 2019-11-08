@@ -1,0 +1,2 @@
+Service = {}
+---@type PlayPlayerServiceService.PlayPlayer = import(".PlayPlayerService")---@type StageServiceService.Stage = import(".StageService")---@type DressServiceService.Dress = import(".DressService")---@type PropServiceService.Prop = import(".PropService")---@type UserServiceService.User = import(".UserService")---@type PlayerServiceService.Player = import(".PlayerService")

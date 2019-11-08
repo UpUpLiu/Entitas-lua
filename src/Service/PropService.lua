@@ -1,0 +1,1 @@
+---@class PropServicelocal M = {}return M
