@@ -54,4 +54,5 @@ EntitasConfig路径下的文件为Ecs的生成配置，  这是一个简单的�
 1. 与Unity Inspector显示的连接，与监测
 2. 生成API优化 （目前有一些参数传递可能是多余的， 然后所有的ComponentIndex，其实可以全部直接使用数字， 因为既然是生成的API，也不用去考虑可读性）已完成
 3. 考虑实现C#版本Event的标签   已完成
-4. 简单的Demo
+4. 支持index和primaryindex标签 已完成
+5. 简单的Demo
