@@ -9,7 +9,7 @@ local Matcher = require("${contexts.source}.Matcher")
 local GroupEvent = require("${contexts.source}.GroupEvent")
 local ${Context_name}_comps = require('.${context_name}Components')
 local ${Context_name}Matcher = require('.${context_name}Matchers')
-local utils = require("Common.utils")
+local tabledeepcopy = table.deepcopy
 
 ---@class ${Name}EventSystem : entitas.ReactiveSystem
 local M = class({},'${Name}EventSystem', classMap.ReactiveSystem)
@@ -34,7 +34,7 @@ end
 function M:execute(es)
     es:foreach( function( e  )
         local comp = e.${comp.event_target.name}
-        local list = utils.CopyTable(e.${name}.value:get_buffer())
+        local list = tabledeepcopy(e.${name}.value:get_buffer())
         for i = 1, #list do
             list[i]:On${Name}(e ${comp.get_func_params('comp.')} );
         end

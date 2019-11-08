@@ -1,4 +1,5 @@
-require("Common.base.class")
+require("..base.class")
+require('..container.table')
 GroupEvent = import(".GroupEvent")
 Matcher = import(".Matcher")
 return {

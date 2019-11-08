@@ -218,51 +218,95 @@ GLOBAL.test_primary_index = function()
     end)
     assert(record == 1, 'after add two uid 1,  xpcall error func must call')
 end
---
---GLOBAL.test_reactivesystem = function()
---    local Context = GameContext
---    local ReactiveSystem_record = 0
---    local entity_count = 0
---    local e = Context:createEntity("123")
---
---    local positionAdd = utils.class("positionAdd", ReactiveSystem)
---    function positionAdd:getTriggers()
---        return {GameMatcher.AllOf(GameMatcher.Position):onEntityAdded()}
---    end
---
---    --在这里处理一些筛选得工作, 如果去掉会提升性能
---    function positionAdd:filter(entity)
---        return true
---    end
---
---    function positionAdd:react(entities)
---        entity_count = #entities
---        ReactiveSystem_record = ReactiveSystem_record + 1
---    end
---    local ss = Systems.new():add(Context:createSystem(positionAdd))
---    ss:initialize()
---    ss:execute()
---    assert(ReactiveSystem_record == 0)
---    e:replacePosition(PosV3(1,1,3))
---    ss:execute()
---    assert(entity_count == 1)
---    assert(ReactiveSystem_record == 1)
---    e:replacePosition(PosV3(3,2,2))
---    ss:execute()
---    assert(entity_count == 1)
---    assert(ReactiveSystem_record == 2)
---    local c = Context:createEntity("123")
---    c:addPosition(PosV3(1,2,2))
---    ss:execute()
---    assert(entity_count == 1, "只有一个改变得单位, 所以应该只有1个")
---    e:replacePosition(PosV3(3,2,2))
---    c:replacePosition(PosV3(1,2,2))
---    ss:execute()
---    assert(entity_count == 2)
---    Context:destroyEntity(e)
---end
+
+GLOBAL.test_reactivesystem = function()
+    ---@type PlayerContext
+    local Context = require("Common.Generated.entitas.PlayerContext"):new(require("Common.Generated.entitas.PlayerEntity"))
+    local ReactiveSystem_record = 0
+    local entity_count = 0
+    local e = Context:CreateEntity("123")
+
+    local positionAdd = class({},"positionAdd", ReactiveSystem)
+    function positionAdd:get_trigger()
+        return {
+            {
+                Matcher({PlayerComponents.Position}),
+                GroupEvent.ADDED
+            }
+        }
+    end
+
+    function positionAdd:filter(entity)
+        return true
+    end
+
+    function positionAdd:execute(es)
+        entity_count = es:size()
+        ReactiveSystem_record = ReactiveSystem_record + 1
+    end
+    local ss = Systems:new(Context):add(positionAdd:new(Context))
+    ss:initialize()
+    ss:execute()
+    assert(ReactiveSystem_record == 0)
+    e:replacePosition(1)
+    ss:execute()
+    assert(entity_count == 1)
+    assert(ReactiveSystem_record == 1)
+    e:replacePosition(1)
+    ss:execute()
+    assert(entity_count == 1)
+    assert(ReactiveSystem_record == 2)
+    local c = Context:CreateEntity()
+    c:addPosition(1)
+    ss:execute()
+    assert(entity_count == 1, "只有一个改变得单位, 所以应该只有1个")
+    e:replacePosition(1)
+    c:replacePosition(1)
+    ss:execute()
+    assert(entity_count == 2)
+end
 
 
+GLOBAL.test_reactivesystem = function()
+    local anyrecord = 0
+    local selfRecord = 0
+    ---@type PlayerContext
+    local Context = require("Common.Generated.entitas.PlayerContext"):new(require("Common.Generated.entitas.PlayerEntity"))
+
+    ---@type entitas.Systems
+    local eventSystem = require("Common.Generated.entitas.PlayerEventSystems"):new(Context)
+    local p = Context:CreateEntity()
+    local ccc = {}
+    function ccc:OnAnyNameListener(e)
+        anyrecord = anyrecord + 1
+    end
+    function ccc:OnNameListener(e)
+        selfRecord = selfRecord + 1
+    end
+
+    local systems = classMap.Systems:new()
+    systems:add(eventSystem)
+    p:AddNameListenerCallBack(ccc)
+    p:AddAnyNameListenerCallBack(ccc)
+    systems:initialize()
+    p:replaceName("123123")
+    systems:execute()
+    assert(selfRecord == 1, 'self must 1')
+    assert(anyrecord == 1, 'any must 1')
+    p:replaceName("456")
+    systems:execute()
+    assert(selfRecord == 2, 'self must 1')
+    assert(anyrecord == 2, 'any must 1')
+    local c = Context:CreateEntity()
+    c:replaceName("55555")
+    systems:execute()
+    assert(selfRecord == 2)
+    assert(anyrecord == 3)
+    c:replaceName("55555")
+    systems:execute()
+    assert(selfRecord == 2)
+    assert(anyrecord == 4)
+end
 
 
 local runner = lu.LuaUnit.new()

@@ -48,12 +48,14 @@ function M:add(system)
     if system.dispatch then
         table_insert(self._net_systems, system)
     end
+    return self
 end
 
 function M:initialize()
     for _, system in pairs(self._initialize_systems) do
         system:initialize()
     end
+    return self
 end
 
 function M:execute()
