@@ -6,7 +6,8 @@ return {
         tag = { tag.Player},
         event = {
             {
-                target = EventTarget.Any
+                target = EventTarget.Any,
+                type = EventType.ADDED,
             },
             {
                 target = EventTarget.self

@@ -46,7 +46,7 @@ end
 
 local mt = {}
 mt.__index = mt
-mt.__tostring = function(t) return t._name end
+--mt.__tostring = function(t) return t._name end
 
 local function make_component(name, ...)
     local tmp = {}

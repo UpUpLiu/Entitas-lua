@@ -37,11 +37,11 @@ class Event(AttrClass):
     def init_event(self, event):
         self.event = event
         self.target = event.target
-        self.type = event.type or 'Added'
+        self.type = event.type or 'ADDED'
         self.priority = event.priority or 0
 
     def get_group_event(self):
-        return 'ADDED'
+        return self.type
 
 class Component():
     def __init__(self, name):

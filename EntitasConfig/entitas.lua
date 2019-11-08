@@ -11,8 +11,8 @@ EventTarget = {
 
 ---@class entitas.gen.EventType
 EventType = {
-	Added = 'Added',
-	Removed = 'Removed',
+	ADDED = 'ADDED',
+	REMOVED = 'REMOVED',
 }
 
 tag = {
