@@ -18,7 +18,7 @@ local Components = {}
     %if not comp.simple:
 ---@class ${Context_name}.${Name}Component
         %for i in range(len(properties)):
----@param ${properties[i][0]} ${comp.get_property(i, contexts)}
+---@field ${properties[i][0]} ${comp.get_property(i, contexts)}
         %endfor
 Components.${Name} = make_component('${name}',  ${params_str(properties)})
     %else:

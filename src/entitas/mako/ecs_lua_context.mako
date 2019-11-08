@@ -28,8 +28,8 @@ local ${Context_name}_comps = require('.${context_name}Components')
 %>\
     %if comp.single:
         %if not comp.simple and comp.single:
----@field ${Context_name}${Name}Entity ${Context_name}Entity
----@field ${name} ${Name}Component
+---@field ${name}Entity ${Context_name}Entity
+---@field ${name} ${Context_name}.${Name}Component
         %endif
     %endif
 %endfor
@@ -75,7 +75,7 @@ end
 function ${Context_name}Context:set${Name}(value)
     if (value ~= self:has${Name}()) then
         if (value) then
-            self:set_unique_component('${name}',${Context_name}_comps.${Name})
+            self:set_unique_component('${name}',${Context_name}_comps.${Name}, true)
         else
             self:remove_unique_component('${name}')
         end
@@ -85,7 +85,7 @@ end
         %endif
 ---@return bool
 function ${Context_name}Context:has${Name}()
-    return self:has_unique_component(${Context_name}_comps.${Name}) ~= nil
+    return self:has_unique_component(${Context_name}_comps.${Name})
 end
     %endif
 ---@return bool

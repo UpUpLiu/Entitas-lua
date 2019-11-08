@@ -73,7 +73,7 @@ end
 function ${Context_name}Entity:set${Name}(v)
     if (v ~= self:has${Name}()) then
         if (v) then
-            self:add(${Context_name}_comps.${Name})
+            self:add(${Context_name}_comps.${Name}, true)
         else
             self:remove(${Context_name}_comps.${Name})
         end

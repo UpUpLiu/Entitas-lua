@@ -32,7 +32,8 @@ return {
         data = {
             "value : number"
         },
-        tag = { tag.Player}
+        tag = { tag.Player},
+        single = true,
     },
     lvl = { --等级
         data = {
@@ -55,5 +56,12 @@ return {
             'value : number'
         },
         tag = { tag.Player}
+    },
+    position ={ --测试
+        data = {
+            'value : Vector3'
+        },
+        tag = { tag.Player}
+
     }
 }

@@ -1,6 +1,7 @@
 local tableinsert = table.insert
 local pairs = pairs
 -- 无序set
+---@class entitas.Set
 local M = {}
 M.__index = M
 

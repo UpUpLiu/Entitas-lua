@@ -8,6 +8,8 @@ local table_insert = table.insert
 ---@field on_entity_added entitas.Delegate
 ---@field on_entity_removed entitas.Delegate
 ---@field on_entity_updated entitas.Delegate
+---@field _matcher entitas.Matcher
+---@field entities entitas.Set
 local M = {}
 
 --[[
@@ -79,9 +81,9 @@ This is used by the context to manage the group.
 function M:handle_entity_silently(entity)
     assert(entity)
     if self._matcher:match_entity(entity) then
-        self:_add_entity_silently(entity)
+        return self:_add_entity_silently(entity)
     else
-        self:_remove_entity_silently(entity)
+        return self:_remove_entity_silently(entity)
     end
 end
 
@@ -89,12 +91,22 @@ end
 This is used by the context to manage the group.
 :param matcher: Entity
 ]]
-function M:handle_entity(entity, comp_value, isremove)
-    if not isremove and self._matcher:match_entity(entity) then
-        self:_add_entity(entity, comp_value)
-    else
-        self:_remove_entity(entity, comp_value)
+function M:handle_entity(entity)
+    if not self._matcher:match_entity(entity) then
+        if not self:_remove_entity_silently(entity) then
+            return
+        end
+        return self.on_entity_removed
     end
+    if not self:_add_entity_silently(entity) then
+        return
+    end
+    return self.on_entity_added
+    --if self._matcher:match_entity(entity) then
+    --    self:_add_entity(entity, comp_value)
+    --else
+    --    self:_remove_entity(entity, comp_value)
+    --end
 end
 
 --[[

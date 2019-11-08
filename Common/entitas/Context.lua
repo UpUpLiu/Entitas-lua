@@ -153,16 +153,21 @@ end
 
 function M:_comp_added(entity, comp_value)
     for _, group in pairs(self._groups) do
-        if group._matcher:match_one(comp_value) then
-            group:handle_entity(entity, comp_value)
+        local ret = group:handle_entity(entity)
+        if ret then
+            ret(entity, comp_value)
         end
+        --if group._matcher:match_one(comp_value) then
+        --    group:handle_entity(entity, comp_value)
+        --end
     end
 end
 
 function M:_comp_removed(entity, comp_value)
     for _, group in pairs(self._groups) do
-        if group._matcher:match_one(comp_value) then
-            group:handle_entity(entity, comp_value,true)
+        local ret = group:handle_entity(entity)
+        if ret then
+            ret(entity, comp_value)
         end
     end
 end
