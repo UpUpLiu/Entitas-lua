@@ -22,7 +22,7 @@ function M:get_trigger()
     return {
         {
             Matcher({${Context_name}_comps.${comp.event_target.Name}}),
-            GroupEvent.${event.get_group_event()} | GroupEvent.UPDATE
+            GroupEvent.${event.get_group_event()}
         }
     }
 end
