@@ -29,7 +29,98 @@ EntitasConfig路径下的文件为Ecs的生成配置，  这是一个简单的�
 如果需要查看一些使用文档， 建议查看原始版本[Entitas C# Wiki](https://github.com/sschmid/Entitas-CSharp/wiki)，因为该实现与原始实现基本是一致的
 
 
-配置说明:   待补充
+# 配置说明:  
+   首先是 配置根文件  entitas.lua  用于全局配置:
+   ---@class entitas.gen.EventTarget
+      EventTarget = {  --事件目标类型
+         Any = 'Any',
+         self = 'self'
+      }
+
+      ---@class entitas.gen.EventType
+      EventType = {  -- 事件类型
+         ADDED = 'ADDED',
+         REMOVED = 'REMOVED',
+      }
+
+      tag = {    --Context 标记
+         Player = 'Player',
+         Prop = 'Prop',
+         Dress = 'Dress',
+         User = 'User',
+         PlayPlayer = 'PlayPlayer',
+         Stage = 'Stage'
+      }
+      local entitas = {
+         namespace ="Entitas",  --命名空间,  暂时无用
+         source ="Common.entitas", -- entita的源文件位置(用于require)
+         output ="../Common/Generated/entitas",  输出位置
+         parse = "lua",  -- 解析方式  目前只有lua  (因为之前有打算支持多种配置  最开始的配置用的是json  因为我有用于开发 h5)
+         tag = tag       -- contexts的tag组
+      }
+
+  工具会自动获取与entitas.lua 同路径下的lua文件, 运行 并检查返回值的Component:
+  return {
+    name ={  --名字
+        data = {          如果Component不是标记Component, 那么需要定义data 用于说明变量
+            "value : string @ index"  格式为:  变量名 : 注释名字 @ attr | attr .. (目前字段的 attr仅支持 index 和 primaryIndex)
+        },
+        tag = { tag.Player},   --标记这个Component 属于那个 Context, 可以配置多个
+        event = {             -- 标记这个Compoent 需要自动生成 事件System
+            {
+                target = EventTarget.Any, -- 目标类型
+                type = EventType.ADDED,   -- 事件类型  默认ADDED
+                priority = --0,  --优先级 (这个暂未实现) 默认0
+            },
+            {
+                target = EventTarget.self
+            }
+        }
+    },
+    uid = {
+		data ={
+			"value : long @ primaryIndex"
+		},
+        Events = {
+
+        },
+        tag = { tag.Player, tag.User }  --支持多个Context配置
+    },
+    exp = { --经验
+        data = {
+            "value : number"
+        },
+        tag = { tag.Player},
+
+    },
+    coin = {  --金币
+        data ={
+            "value : number",
+        },
+        tag = { tag.Player}
+
+    },
+    gem = { --钻石
+        data = {
+            "value : number"
+        },
+        tag = { tag.Player}
+    },
+    lvl = { --等级
+        data = {
+            'value : number'
+        },
+        tag = { tag.Player}
+    },
+    energy = { --体力
+        data = {
+            'value : number'
+        },
+        tag = { tag.Player}
+    }
+}
+
+
 
 # 简单展示
 生成代码之后得使用体验
