@@ -2,8 +2,8 @@ import json
 import os
 from mako.template import Template
 from pathlib import Path
-import src.utils as utils
-import src.config as config
+import utils as utils
+import config as config
 COMMON_LUA_PROJECT_ROOT = config.COMMON_LUA_PROJECT_ROOT
 
 

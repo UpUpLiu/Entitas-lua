@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-from src.entitas.Parser.BaseParser import BaseParser, ContextData, Component
+from entitas.Parser.BaseParser import BaseParser, ContextData, Component
 import json
-import src.utils as utils
+import utils as utils
 from lupa import *
 
 lua = LuaRuntime()
