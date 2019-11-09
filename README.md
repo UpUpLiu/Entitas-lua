@@ -8,7 +8,7 @@
    pip install mako
    pip install lupa
    pip install pathlib
-3. cd src
+3. cd src    
    python build.py 可以执行生成
 
 
