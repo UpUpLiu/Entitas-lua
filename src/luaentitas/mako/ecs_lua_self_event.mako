@@ -10,12 +10,12 @@ local GroupEvent = require("${contexts.source}.GroupEvent")
 local ${Context_name}_comps = require('.${context_name}Components')
 local ${Context_name}Matcher = require('.${context_name}Matchers')
 local tabledeepcopy = table.deepcopy
+
 ---@class ${Name}EventSystem : entitas.ReactiveSystem
 local M = class({},'${Name}EventSystem', classMap.ReactiveSystem)
 
 function M:Ctor(context)
-    M.__super.Ctor(self, context)
-    self._listeners = context:get_group(${Context_name}Matcher.${Name})
+    M.__base.Ctor(self, context)
 end
 
 function M:get_trigger()
@@ -28,18 +28,15 @@ function M:get_trigger()
 end
 
 function M:filter(entity)
-    return entity:has${comp.event_target.Name}()
+    return entity:has${comp.event_target.Name}() and entity:has${comp.Name}()
 end
 
 function M:execute(es)
-    local buffer = self._listeners:get_entity_buffer()
     es:foreach( function( e  )
         local comp = e.${comp.event_target.name}
-        for _, entity in pairs(buffer) do
-            local list = tabledeepcopy(entity.${name}.value:get_buffer())
-            for i = 1, #list do
-                list[i]:On${Name}(e ${comp.get_func_params('comp.')} );
-            end
+        local list = entity.${name}.value:get_bufferkv()
+        for k ,v in pairs(list) do
+            k(v, e ${comp.get_func_params('comp.')} );
         end
     end)
 end

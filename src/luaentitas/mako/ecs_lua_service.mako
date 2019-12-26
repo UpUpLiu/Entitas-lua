@@ -6,5 +6,8 @@
 ---@class ${Context_name}Service
 local M = {}
 
+function M.init()
+end
+
 return M
 

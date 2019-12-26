@@ -27,6 +27,8 @@ local entitas = {
 	namespace ="Entitas",
 	source ="Common.entitas",
 	output ="../Common/Generated/entitas",
+	service_path = "../src/Entitas",
+	context_index = "ContextIndex",
 	parse = "lua",
 	tag = tag
 }

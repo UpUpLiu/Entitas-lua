@@ -1,4 +1,4 @@
-from src.entitas.Parser.BaseParser import BaseParser, ContextData
+from src.luaentitas.Parser.BaseParser import BaseParser, ContextData
 import json
 import os
 from mako.template import Template

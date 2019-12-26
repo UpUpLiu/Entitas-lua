@@ -32,6 +32,10 @@ local set = require('Common.container.set')
 % endfor
 local ${Context_name}Entity = {}
 
+function ${Context_name}Entity:Ctor(...)
+    self.__base.Ctor(self, ...)
+end
+
 %for comp in components:
 <%
     Name = comp.Name
@@ -84,18 +88,14 @@ end
 %endfor
 %if event_comps:
     %for comp in event_comps:
-        <%
-            print(comp.name)
-            print(Name)
-        %>
-function ${Context_name}Entity:Add${comp.Name}CallBack(callback)
+function ${Context_name}Entity:Add${comp.Name}CallBack(callback, target)
     local list
     if not self:has${comp.Name}() then
         list = set.new(false)
     else
         list = self.${comp.name}.value
     end
-    list:insert(callback)
+    list:insertkv(callback, target)
     self:replace${comp.Name}(list)
 end
 

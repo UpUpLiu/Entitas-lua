@@ -36,6 +36,10 @@ local ${Context_name}_comps = require('.${context_name}Components')
 ---@field createEntity fun():${Context_name}Entity
 local ${Context_name}Context = {}
 
+function ${Context_name}Context:Ctor(...)
+    self.__base.Ctor(self, ...)
+end
+
 %for comp in components:
 <%
     Name = comp.Name
@@ -131,6 +135,29 @@ function ${Context_name}Context:initGenerateEntityIndexes()
             %endif
         %endfor
 %endfor
+
+<%
+    i = 0
+%>
+%for index in contexts.muIndex:
+<%
+    matcher_parm = []
+    call_parm = []
+    i += 1
+    for index_data in index.index_data:
+        Name = index_data.k
+        Name = Name[0].upper() + Name[1:]
+        matcher_parm.append(Context_name + "_comps." + Name)
+        value = index_data.v
+        call_parm.append('{' + 'comp_type={0},  key =  "{1}"'.format(Context_name + "_comps." + Name, value) + '}')
+    print(','.join(matcher_parm))
+%>\
+    local group = self:get_group(Matcher({${','.join(matcher_parm)}}))
+    self._ContextIndex${i} = classMap.EntityMuIndex:new(group, {
+        ${','.join(call_parm)}
+    })
+%endfor
+
 end
 
 %for comp in components:
@@ -154,5 +181,28 @@ end
             %endif
         %endfor
 %endfor
+
+
+<%
+    i = 0
+%>
+%for index in contexts.muIndex:
+<%
+    call_parm = []
+    i += 1
+    name_parm = []
+    for index_data in index.index_data:
+        Name = index_data.k
+        Name = Name[0].upper() + Name[1:]
+        name_parm.append(Name)
+        name_parm.append(index_data.v)
+        call_parm.append(Name+'_'+value)
+%>\
+---@return ${Context_name}Entity[]
+function ${Context_name}Context:${index.funcName}(${','.join(call_parm)})
+    return self._ContextIndex${i}:get_entities(${','.join(call_parm)})
+end
+%endfor
+
 
 return ${Context_name}Context

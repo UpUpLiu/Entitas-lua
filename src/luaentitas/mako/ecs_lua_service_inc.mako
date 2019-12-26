@@ -4,4 +4,4 @@
 %>\
 ---@type ${contexts.simple_name}Service
 Service.${contexts.simple_name} = import(".${contexts.simple_name}Service")
-
+Service.${contexts.simple_name}.init()

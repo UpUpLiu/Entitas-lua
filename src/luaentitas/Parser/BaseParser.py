@@ -2,10 +2,16 @@ import json
 import os
 from mako.template import Template
 from pathlib import Path
-import utils as utils
-import config as config
-COMMON_LUA_PROJECT_ROOT = config.COMMON_LUA_PROJECT_ROOT
+import src.utils as utils
+import build_config
+import collections
+CLIENT_LUA_PROJECT_ROOT = Path( build_config.CLIENT_LUA_PROJECT_ROOT)
+import operator
 
+class KV:
+    def __init__(self):
+        self.k = None
+        self.v = None
 
 class AttrClass():
     def __init__(self):
@@ -22,6 +28,22 @@ class Index(AttrClass):
     def on_init(self):
         return
 
+class MuIndex(AttrClass):
+    def on_init(self):
+        self.index_data = []
+        self.funcName = ""
+        return
+    
+    def addData(self, comp_name, comp_value):
+        temp_t = KV()
+        temp_t.k = comp_name
+        temp_t.v = comp_value
+        self.index_data.append(temp_t)
+        return
+
+    def setFuncName(self, name):
+        self.funcName = name
+
 class Event(AttrClass):
     def __init__(self):
         super().__init__()
@@ -29,7 +51,7 @@ class Event(AttrClass):
         self.target = None
         self.type = None
         self.priority = 0
-
+        self.action = None
     def on_init(self):
         self.event = None
         return
@@ -39,9 +61,13 @@ class Event(AttrClass):
         self.target = event.target
         self.type = event.type or 'ADDED'
         self.priority = event.priority or 0
+        self.action = event.action
 
     def get_group_event(self):
-        return self.type
+        if self.type != "ALL":
+            return "GroupEvent."+self.type
+        else:
+            return "GroupEvent.ADDED | GroupEvent.REMOVED"
 
 class Component():
     def __init__(self, name):
@@ -53,9 +79,19 @@ class Component():
         self.tag = None
         self.has_attr = False
         self.Name = name[0].upper() + name[1:]
-        self.event = []
         self.event_target = None
+        self.event_action = None
+        self.event = []
         return
+
+    def __cmp__(self, other):
+        if self.name > other.name:
+            return 1
+        else:
+            return -1
+
+    def is_empty(self):
+        return len(self.data) == 0
 
     def set_data(self, data):
         self.data = []
@@ -173,6 +209,7 @@ class ContextData():
         self.source = ""
         self.name = tag
         self.Name = tag[0].upper() + tag[1:]
+        self.muIndex = []
         self.tag = tag
         self.pre_tag = ""
         self.simple_name = tag
@@ -201,6 +238,10 @@ class ContextData():
             if comp.tag is None:
                 raise (comp.name + "tag is None")
 
+    def addContextMuIndex(self, index):
+        self.muIndex.append(index)
+        return
+
 
 class BaseParser:
     parser_tag = ""
@@ -217,10 +258,13 @@ class BaseParser:
         self.source =""
         self.namespace = ""
         self.outpath = ""
-        self.contexts = {}
+        self.contexts = collections.OrderedDict()
+        self.service_path = Path("")
         self.scirpt_path = Path(os.path.split(os.path.realpath(__file__))[0])
         self.mako_path = self.scirpt_path / '../mako'
-        self.config_path = COMMON_LUA_PROJECT_ROOT / "../EntitasConfig"
+        self.config_path = CLIENT_LUA_PROJECT_ROOT / "EntitasConfig"
+        self.context_index_path = self.config_path / "ContextIndex.lua"
+
         self.base_config_file = self.config_path / ("entitas.json")
         self.on_init()
         self.load_base_config()
@@ -288,7 +332,7 @@ class BaseParser:
         file.close()
 
     def generate_auto_service(self, context):
-        script_path = COMMON_LUA_PROJECT_ROOT / 'Service'
+        script_path = self.service_path / 'Service'
         file_name = script_path / (context.simple_name + 'Service.lua')
         if not os.path.exists(file_name):
             temp_file = utils.open_file(file_name , 'w')
@@ -303,7 +347,7 @@ class BaseParser:
             temp_file.write(content)
 
     def generate_auto_service_inc(self):
-        script_path = COMMON_LUA_PROJECT_ROOT / 'Service'
+        script_path = self.service_path / 'Service'
         template = Template(filename=str(self.mako_path / "ecs_lua_service_Inc.mako"),
                             module_directory=os.path.join(self.scirpt_path, 'makoCache'))
         file_name = os.path.join(script_path, "EntitasAutoServiceInc.lua")
@@ -323,17 +367,30 @@ class BaseParser:
             comps = context.components
             for comp in comps:
                 for event in comp.event:
-                    temp_name = comp.Name + 'Listener'
+                    if not event.type:
+                        event.type = 'Added'
+
+                    temp_name = comp.Name + event.type + 'Listener'
+
                     if event.target == 'Any':
                         temp_name = 'Any' + temp_name
                     event_comp = Component(temp_name)
-                    event_comp.set_data(['value : callback[]'])
+                    if not event.action:
+                        event_comp.set_data(['value : callback[]'])
                     event_comp.event_target = comp
+                    if event.action:
+                        comp.event_action = event.action
                     context.addEventComponent(event_comp)
                     context.addComponent(event_comp)
-                    file_name = os.path.join(self.outpath, event_comp.Name + "EventSystem.lua")
+                    mako_file = ""
+                    if event.action:
+                        file_name = os.path.join(self.outpath, event_comp.Name + "SendEventSystem.lua")
+                        mako_file = "ecs_lua_sendEvent_system.mako"
+                    else:
+                        file_name = os.path.join(self.outpath, event_comp.Name + "EventSystem.lua")
+                        mako_file = "ecs_lua_"+ event.target +"_event.mako"
                     file = utils.open_file(file_name, 'w')
-                    template = Template(filename=str(self.mako_path / ("ecs_lua_"+ event.target +"_event.mako")),
+                    template = Template(filename=str(self.mako_path / mako_file),
                                         module_directory=os.path.join(self.scirpt_path, 'makoCache'))
                     content = template.render(
                         context_name=context.name,
@@ -345,6 +402,60 @@ class BaseParser:
         self.after_generate_event()
 
     def after_generate_event(self):
+        self.generate_reactive_system()
+        # self.generate_send_event_system()
+        self.generate_auto_send_event()
+        return
+
+    def generate_auto_send_event(self):
+        event_file = os.path.join(self.outpath, 'EntitasEventAutoInc.lua')
+        file = utils.open_file(event_file, 'w')
+        template = Template(filename=str(self.mako_path / ("ecs_lua_event_name.mako")),
+                            module_directory=os.path.join(self.scirpt_path, 'makoCache'))
+        content = template.render(
+            contexts=self.contexts,
+            source_path=self.source,
+        )
+        file.write(content.replace('\n', ''))
+
+    def generate_reactive_system(self):
+        for key, context in self.contexts.items():
+            if not context.event_comps:
+                continue
+            temp_name = context.name + 'EventSystems'
+            file_name = os.path.join(self.outpath, temp_name + ".lua")
+            file = utils.open_file(file_name, 'w')
+            template = Template(filename=str(self.mako_path / ("ecs_lua_event_inc.mako")),
+                                module_directory=os.path.join(self.scirpt_path, 'makoCache'))
+            content = template.render(
+                context_name=context.name,
+                contexts=context,
+                source_path=self.source,
+                components=context.event_comps,
+            )
+            file.write(content.replace('\n', ''))
+
+        return
+
+    def generate_send_event_system(self):
+        for key, context in self.contexts.items():
+            if not context.event_comps:
+                continue
+            temp_name = context.name + 'EventSystems'
+            file_name = os.path.join(self.outpath, temp_name + ".lua")
+            file = utils.open_file(file_name, 'w')
+            template = Template(filename=str(self.mako_path / ("ecs_lua_sendEvent_system.mako")),
+                                module_directory=os.path.join(self.scirpt_path, 'makoCache'))
+            content = template.render(
+                context_name=context.name,
+                contexts=context,
+                source_path=self.source,
+                components=context.event_comps,
+            )
+            file.write(content.replace('\n', ''))
+        return
+
+    def generate_context_index(self):
         for key, context in self.contexts.items():
             if not context.event_comps:
                 continue
@@ -363,8 +474,16 @@ class BaseParser:
 
         return
 
+    def before_generate(self):
+        for key, context in self.contexts.items():
+            cmpfun = operator.attrgetter('name')
+            context.components.sort(key = cmpfun)
+            context.event_comps.sort(key = cmpfun)
+        return
+
     def generate(self):
         self.generate_event()
+        self.before_generate()
         self.generate_context()
         self.generate_component()
         self.generate_entity()
