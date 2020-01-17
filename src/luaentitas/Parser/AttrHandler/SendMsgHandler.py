@@ -34,6 +34,7 @@ class SendMsgHandler(BaseAttrHandler):
         content = content.replace('\r\n', '')
         file.write(content)
         file.close()
+        context.add_custom_inc("require('.{0}')".format(str( context.name.Name + comp.name.Name + 'SendEventSystem')))
 
     def start_handle(self):
         for attr in self.attrs:

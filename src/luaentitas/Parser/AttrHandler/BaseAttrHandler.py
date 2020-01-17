@@ -8,12 +8,14 @@ from pythonentitas.Generated.Entitas.ContextEntity import ContextEntity
 
 
 class BaseAttrHandler:
+    context: ContextEntity
+
     def __init__(self, attr_define):
         self.attr_define = attr_define
         self.className = self.__class__.__name__
         self.script_path = self.get_script_path()
         self.mako_path = self.script_path / 'mako' / (self.className + ".mako")
-        self.context = None # type:ContextEntity
+        self.context = None
         return
 
     def get_script_path(self):

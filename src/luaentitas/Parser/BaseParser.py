@@ -542,7 +542,8 @@ class BaseParser:
         self.generate_context()
         self.generate_component()
         self.generate_entity()
-        self.generate_autoinc()
         # self.generate_auto_service_inc()
 
         self.generate_attrs()
+        self.generate_autoinc()
+

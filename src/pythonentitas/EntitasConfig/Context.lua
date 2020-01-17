@@ -35,5 +35,11 @@ return {
             'value : string'
         },
         tag = {tag.Context}
+    },
+    customInc = {
+        data= {
+            'value : string[]'
+        },
+        tag = {tag.Context}
     }
 }

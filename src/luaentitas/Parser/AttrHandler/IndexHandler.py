@@ -26,7 +26,7 @@ class IndexHandler(BaseAttrHandler):
     def get_out_file_name(self):
         return self.attr_define.Key
 
-    def render_mako(self, fime_name,  context):
+    def render_mako(self, fime_name,  context ):
         file_path = os.path.join(self.context.outPut.value,  context.name.Name + fime_name + '.lua')
         file = utils.open_file(file_path, 'w')
         template = Template(filename=str(self.mako_path),
@@ -36,6 +36,8 @@ class IndexHandler(BaseAttrHandler):
         content = content.replace('\r\n', '')
         file.write(content)
         file.close()
+        context.add_custom_inc("require('.{0}')".format(str(context.name.Name + fime_name)))
+
 
     def start_handle(self):
         self.render_mako(self.get_out_file_name(), self.context)

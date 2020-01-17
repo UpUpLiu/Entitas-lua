@@ -12,3 +12,12 @@ class ContextEntity(Entity):
         comps.append(comp)
         self.replaceComponents(comps)
         return
+
+    def add_custom_inc(self, path):
+        if not self.hasCustomInc():
+            incs = []
+        else:
+            incs = self.customInc.value
+        incs.append(path)
+        self.replaceCustomInc(incs)
+        return
