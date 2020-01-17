@@ -4,9 +4,8 @@ return {
             "value : number"
         },
         attr = {
-            primaryIndex ={
-                "value : string "
-            }
+            Event = {},
+            SendMsg = EventType.ALL
         },
         tag = { tag.Dress}
     },

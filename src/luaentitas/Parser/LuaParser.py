@@ -1,14 +1,22 @@
 # -*- coding: utf-8 -*-
+import os
 from pathlib import Path
 
 from src.luaentitas.Parser.BaseParser import BaseParser, ContextData, Component, MuIndex
 import json
 import src.utils as utils
 from lupa import *
-
+from src.pythonentitas.Generated.Entitas.Contexts import Contexts
 lua = LuaRuntime()
 
 class LuaParser(BaseParser):
+    def __init__(self, configPath):
+        self.scirpt_path = Path(os.path.split(os.path.realpath(__file__))[0])
+        self.config_path = configPath
+        self.file_suffix = '.lua'
+        super().__init__()
+
+
     def on_init(self):
         self.base_config_file = self.config_path / ("entitas.lua")
 
@@ -20,25 +28,13 @@ class LuaParser(BaseParser):
                     text = load_f.read()
                     ttt = lua.compile(text)()
                     components = self.get_components(ttt)
+                    # print('new comp', len(components))
                     for comp in components:
-                        for tag in comp.tag:
+                        # print('tag',comp.tags.value)
+                        for tag in comp.tags.value:
+                            # print(comp.tags)
+                            # print('add comp', len(components))
                             self.contexts[tag].addComponent(comp)
-
-    def load_context_index(self):
-        with open(self.context_index_path , 'r') as load_f:
-            text = load_f.read()
-            config = lua.compile(text)()
-        for tag in config :
-            context_index = config[tag].index
-            context = self.contexts[tag]
-            if context_index:
-                context_index_data = context_index.data
-                mu_index = MuIndex()
-                mu_index.setFuncName(context_index.funcName)
-                for comp_name in context_index_data:
-                    mu_index.addData(comp_name,  context_index_data[comp_name])
-
-                context.addContextMuIndex(mu_index)
 
     def get_components(self, table):
         ret = []
@@ -47,19 +43,29 @@ class LuaParser(BaseParser):
         return ret
 
     def get_component(self, key, table):
-        comp = Component(key)
+        comp = Contexts.component.create_component(key)
+        # print("2",list(table.tag), key , )
+        # if table.data:
+        #     print('3', list(table.data.values()))
+        comp.replaceTags(list(table.tag))
+        # print(comp.tags.value)
         if table.data:
-            comp.set_data(list(table.data.values()))
+            comp.set_component_data(list(table.data.values()))
+        else:
+            comp.setIsSimple(True)
+
         if table.single is not None:
-            comp.set_single(True)
+            comp.setIsSingle(True)
 
-        comp.set_tag(list(table.tag.values()))
+        comp.replaceTags(list(table.tag.values()))
+
         if table.event is not None:
-            comp.set_event(table.event)
+            comp.replaceEvents(table.event)
 
-        # if table.attr is not None:
-        #     for at in table.attr:
-        #         comp.add_attr(at, at)
+        if table.attr is not None:
+            for at in table.attr:
+                comp.addAttr(at, table.attr[at])
+
         return comp
 
     def parse_context(self, key, table):
@@ -89,14 +95,17 @@ class LuaParser(BaseParser):
         self.parser_tag = config.parse
         self.tag = list(config.tag.values())
         self.service_path = self.config_path / Path(config.service_path)
+        for key in config.AttrDefine:
+            self.add_attr_define(key, config.AttrDefine[key])
         self.tag.sort()
         for tag in self.tag:
-            context = ContextData(tag)
-            context.setSource(self.source)
-            context.setOutPut(self.outpath)
+            context = Contexts.context.create_entity()
+            context.replaceTag(tag)
+            context.replaceName(tag[0].lower() + tag[1:], tag[0].upper() + tag[1:])
+            context.replaceSource(self.source)
+            context.replaceOutPut(self.outpath)
             self.contexts[tag] = context
-        self.load_context_index()
 
 
 if __name__ == "__main__":
-    LuaParser().generate()
+    LuaParser( Path(utils.get_python_fiel_Path(__file__) + "/../../../EntitasConfig")).generate()

@@ -253,7 +253,7 @@ class BaseParser:
     source = ""
     output = ""
     namespace = ""
-
+    file_suffix = ""
     def __init__(self):
         self.source =""
         self.namespace = ""
@@ -262,7 +262,6 @@ class BaseParser:
         self.service_path = Path("")
         self.scirpt_path = Path(os.path.split(os.path.realpath(__file__))[0])
         self.mako_path = self.scirpt_path / '../mako'
-        self.config_path = CLIENT_LUA_PROJECT_ROOT / "EntitasConfig"
         self.context_index_path = self.config_path / "ContextIndex.lua"
 
         self.base_config_file = self.config_path / ("entitas.json")
@@ -303,24 +302,42 @@ class BaseParser:
 
     def generate_context(self):
         for key, context in self.contexts.items():
-            self.render_mako("Context.lua",'ecs_lua_context.mako', context)
+            self.render_mako("Context" +  self.file_suffix ,'ecs_lua_context.mako', context)
+            file_name = os.path.join(self.outpath / "../Extension/Context", context.name + "Context" +  self.file_suffix)
+            if not os.path.exists(file_name):
+                file = utils.open_file(file_name, 'w')
+                file.write('''
+from ...Entitas.{0}Context import {0}Context as Context
+class {0}Context(Context):
+    def __init__(self):
+        super().__init__()'''.format(context.name))
+                file.close()
 
     def generate_entity(self):
         for key, context in self.contexts.items():
-            self.render_mako("Entity.lua",'ecs_lua_entity.mako', context)
-
-    def generate_matcher(self):
-        for key, context in self.contexts.items():
-            self.render_mako("Components.lua",'ecs_lua_make_component.mako', context)
+            self.render_mako("Entity" +  self.file_suffix ,'ecs_lua_entity.mako', context)
+            file_name = os.path.join(self.outpath / "../Extension/Entity", context.name + "Entity" +  self.file_suffix)
+            if not os.path.exists(file_name):
+                file = utils.open_file( file_name , 'w')
+                file.write('''
+from ...Entitas.{0}Entity import {0}Entity as Entity
+class {0}Entity(Entity):
+    def __init__(self):
+        super().__init__()'''.format(context.name))
+                file.close()
 
     def generate_component(self):
         for key, context in self.contexts.items():
-            self.render_mako("Matchers.lua",'ecs_lua_matcher.mako', context)
+            self.render_mako("Components" +  self.file_suffix ,'ecs_lua_make_component.mako', context)
+
+    def generate_matcher(self):
+        for key, context in self.contexts.items():
+            self.render_mako("Matchers"+  self.file_suffix ,'ecs_lua_matcher.mako', context)
 
     def generate_autoinc(self):
         template = Template(filename=str(self.mako_path / "ecs_lua_autoinc.mako"),
                             module_directory=os.path.join(self.scirpt_path, 'makoCache'))
-        file_name = os.path.join(self.outpath, "EntitasAutoInc.lua")
+        file_name = os.path.join(self.outpath, "Contexts" + self.file_suffix)
         file = utils.open_file(file_name, 'w')
         content = template.render(
             contexts= self.contexts,
@@ -482,11 +499,11 @@ class BaseParser:
         return
 
     def generate(self):
-        self.generate_event()
-        self.before_generate()
+        # self.generate_event()
+        # self.before_generate()
         self.generate_context()
         self.generate_component()
         self.generate_entity()
-        self.generate_matcher()
+        # self.generate_matcher()
         self.generate_autoinc()
-        self.generate_auto_service_inc()
+        # self.generate_auto_service_inc()

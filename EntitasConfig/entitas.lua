@@ -13,12 +13,38 @@ EventTarget = {
 EventType = {
 	ADDED = 'ADDED',
 	REMOVED = 'REMOVED',
+	ALL = 'ALL',
+}
+
+ExtensionTarget = {
+	Context = "Context",
+	Entity = "Entity",
+}
+
+AttrDefine = {
+	Index = {
+		attrList = {
+			'index', 'primaryIndex', 'muIndex'
+		},
+		handleTogether = true
+	},
+
+	Event = {
+	},
+
+	SendMsg = {
+	},
 }
 
 tag = {
-	Component = 'Component',
-	Context = 'Context'
+	Player = 'Player',
+	Prop = 'Prop',
+	Dress = 'Dress',
+	User = 'User',
+	PlayPlayer = 'PlayPlayer',
+	Stage = 'Stage'
 }
+
 local entitas = {
 	namespace ="Entitas",
 	source ="Common.entitas",
@@ -26,7 +52,8 @@ local entitas = {
 	service_path = "../src/Entitas",
 	context_index = "ContextIndex",
 	parse = "lua",
-	tag = tag
+	tag = tag,
+	AttrDefine = AttrDefine
 }
 
 return entitas

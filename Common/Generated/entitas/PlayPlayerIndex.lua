@@ -1,0 +1,1 @@
+local PlayPlayerContext = classMap.PlayPlayerContextfunction PlayPlayerContext:initGenerateEntityIndexes()end

@@ -1,0 +1,1 @@
+local StageContext = classMap.StageContextfunction StageContext:initGenerateEntityIndexes()end

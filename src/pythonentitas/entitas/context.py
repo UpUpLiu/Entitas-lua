@@ -40,7 +40,6 @@ class Context(object):
         """Creates an entity. Pop one entity from the pool if it is not
         empty, otherwise creates a new one. Increments the entity index.
         Then adds the entity to the list.
-        :rtype: Entity
         """
         entity = (self._reusable_entities.pop() if self._reusable_entities
                   else Entity())
@@ -56,12 +55,28 @@ class Context(object):
 
         return entity
 
+    def init_entity(self, entity):
+        """Creates an entity. Pop one entity from the pool if it is not
+        empty, otherwise creates a new one. Increments the entity index.
+        Then adds the entity to the list.
+        """
+        entity.activate(self._entity_index)
+        self._entity_index += 1
+
+        self._entities.add(entity)
+
+        entity.on_component_added += self._comp_added_or_removed
+        entity.on_component_removed += self._comp_added_or_removed
+        entity.on_component_replaced += self._comp_replaced
+
+        return entity
     def destroy_entity(self, entity):
         """Removes an entity from the list and add it to the pool. If
         the context does not contain this entity, a
         :class:`MissingEntity` exception is raised.
         :param entity: Entity
         """
+
         if not self.has_entity(entity):
             raise MissingEntity()
 
@@ -88,7 +103,19 @@ class Context(object):
         return group
 
     def set_unique_component(self, comp_type, *args):
-        self.create_entity().add(comp_type, *args)
+        entity = self.create_entity()
+        new_comp = comp_type.new(...)
+        exec('self.{0}Entity = entity'.format(comp_type._name), globals(), locals())
+        exec('self.{0} = new_comp'.format(comp_type._name), globals(), locals())
+
+        comp = entity.add_with_component(comp_type, new_comp)
+        return comp, entity
+
+    def remove_unique_component(self, name):
+        oldEntity = exec('self.{0}Entity'.format(name), globals(), locals())
+        exec('self.{0} = None'.format(name), globals(), locals())
+        exec('self.{0}Entity = None'.format(name), globals(), locals())
+        self.destroy_entity(oldEntity)
 
     def get_unique_component(self, comp_type):
         group = self.get_group(Matcher(comp_type))

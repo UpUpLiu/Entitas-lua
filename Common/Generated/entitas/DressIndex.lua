@@ -1,0 +1,1 @@
+local DressContext = classMap.DressContextfunction DressContext:initGenerateEntityIndexes()end

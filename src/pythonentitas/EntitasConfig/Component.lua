@@ -1,50 +1,51 @@
 return {
-    IsSingle = {
-        tag = tag.Component
+    isSingle = {
+        tag = {tag.Component}
     },
-    IsSimple = {
-        tag = tag.Component
+    isSimple = {
+        tag ={tag.Component}
     },
     name = {
         data = {
-            'value : string'
+            'name : string',
+            'Name : string'
         },
-        tag = tag.Component
+        tag = {tag.Component}
     },
-    Name = {
-        data = {
-            'value : string'
+    tags = {
+         data = {
+            'value : string[]',
         },
-        tag = tag.Component
+        tag = {tag.Component}
     },
     eventTarget = {
         data = {
             'value : object'
         },
-        tag = tag.Component
+        tag = {tag.Component}
     },
     eventAction = {
         data = {
             'value : object'
         },
-        tag = tag.Component
+        tag = {tag.Component}
     },
     events = {
         data = {
             'value : []'
         },
-        tag = tag.Component
+        tag = {tag.Component}
     },
     dates = {
         data = {
             'value : []'
         },
-        tag = tag.Component
+        tag = {tag.Component}
     },
     attrs = {
         data = {
             'value : []'
         },
-        tag = tag.Component
+        tag = {tag.Component}
     }
 }

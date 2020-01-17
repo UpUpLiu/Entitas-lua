@@ -1,0 +1,1 @@
+local PropContext = classMap.PropContextfunction PropContext:initGenerateEntityIndexes()end

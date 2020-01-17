@@ -5,6 +5,12 @@ from pathlib import Path
 import src.utils as utils
 import build_config
 import collections
+import importlib
+
+from luaentitas.Parser.AttrHandler import BaseAttrHandler
+from pythonentitas.Generated.Entitas.AttrEntity import AttrEntity
+from pythonentitas.Generated.Entitas.ContextEntity import ContextEntity
+
 CLIENT_LUA_PROJECT_ROOT = Path( build_config.CLIENT_LUA_PROJECT_ROOT)
 import operator
 
@@ -243,6 +249,28 @@ class ContextData():
         self.muIndex.append(index)
         return
 
+class AttrDefine:
+    attrList = None
+
+    def __init__(self, key, data):
+        if data.attrList:
+            self.attrList = set()
+            for index in data.attrList:
+                self.attrList.add(data.attrList[index])
+        else:
+            self.attrList = {key}
+        self.handleTogether = False
+        self.key = key
+        self.Key = key[0].upper() + key[1:]
+        if data.handleTogether:
+            self.handleTogether = True
+        return
+
+    def hand_attr(self, attr):
+        if self.attrList[attr] is None:
+            return
+        print("处理attr")
+        return
 
 class BaseParser:
     parser_tag = ""
@@ -254,22 +282,26 @@ class BaseParser:
     source = ""
     output = ""
     namespace = ""
-
+    attrDefine = None
+    file_suffix = ""
     def __init__(self):
         self.source =""
         self.namespace = ""
         self.outpath = ""
+        self.attrDefine = []  # type: list[AttrDefine]
         self.contexts = collections.OrderedDict()
         self.service_path = Path("")
-        self.scirpt_path = Path(os.path.split(os.path.realpath(__file__))[0])
         self.mako_path = self.scirpt_path / '../mako'
-        self.config_path = CLIENT_LUA_PROJECT_ROOT / "EntitasConfig"
         self.context_index_path = self.config_path / "ContextIndex.lua"
-
         self.base_config_file = self.config_path / ("entitas.json")
         self.on_init()
         self.load_base_config()
         self.load_context_config()
+
+    def add_attr_define(self, key, attr_define):
+        attr = AttrDefine(key, attr_define)
+        self.attrDefine.append(attr)
+        return
 
     def load_base_config(self):
         return
@@ -286,7 +318,7 @@ class BaseParser:
         return
 
     def render_mako(self, fime_name, mako_name, context):
-        file_path = os.path.join(self.outpath,  context.name + fime_name)
+        file_path = os.path.join(self.outpath,  context.name.Name + fime_name)
         file = utils.open_file(file_path, 'w')
         template = Template(filename=str(self.mako_path / mako_name),
                             module_directory=os.path.join(self.scirpt_path, 'makoCache'))
@@ -298,25 +330,20 @@ class BaseParser:
 
     def template_render(self, template, context):
         return template.render(
-            context_name=context.name,
-            contexts= context,
-            source_path= self.source)
+            _context = context
+        )
 
     def generate_context(self):
         for key, context in self.contexts.items():
-            self.render_mako("Context.lua",'ecs_lua_context.mako', context)
+            self.render_mako("Context" + self.file_suffix,'ecs_lua_context.mako', context)
 
     def generate_entity(self):
         for key, context in self.contexts.items():
-            self.render_mako("Entity.lua",'ecs_lua_entity.mako', context)
-
-    def generate_matcher(self):
-        for key, context in self.contexts.items():
-            self.render_mako("Components.lua",'ecs_lua_make_component.mako', context)
+            self.render_mako("Entity"+ self.file_suffix,'ecs_lua_entity.mako', context)
 
     def generate_component(self):
         for key, context in self.contexts.items():
-            self.render_mako("Matchers.lua",'ecs_lua_matcher.mako', context)
+            self.render_mako("Components"+ self.file_suffix,'ecs_lua_make_component.mako', context)
 
     def generate_autoinc(self):
         template = Template(filename=str(self.mako_path / "ecs_lua_autoinc.mako"),
@@ -324,8 +351,8 @@ class BaseParser:
         file_name = os.path.join(self.outpath, "EntitasAutoInc.lua")
         file = utils.open_file(file_name, 'w')
         content = template.render(
-            contexts= self.contexts,
-            source_path= self.source
+            contexts = self.contexts,
+            source_path = self.source
         )
         content = content.replace('\n', '')
         content = content.replace('\r\n', '')
@@ -405,19 +432,19 @@ class BaseParser:
     def after_generate_event(self):
         self.generate_reactive_system()
         # self.generate_send_event_system()
-        self.generate_auto_send_event()
+        # self.generate_auto_send_event()
         return
 
-    def generate_auto_send_event(self):
-        event_file = os.path.join(self.outpath, 'EntitasEventAutoInc.lua')
-        file = utils.open_file(event_file, 'w')
-        template = Template(filename=str(self.mako_path / ("ecs_lua_event_name.mako")),
-                            module_directory=os.path.join(self.scirpt_path, 'makoCache'))
-        content = template.render(
-            contexts=self.contexts,
-            source_path=self.source,
-        )
-        file.write(content.replace('\n', ''))
+    # def generate_auto_send_event(self):
+    #     event_file = os.path.join(self.outpath, 'EntitasEventAutoInc.lua')
+    #     file = utils.open_file(event_file, 'w')
+    #     template = Template(filename=str(self.mako_path / ("ecs_lua_event_name.mako")),
+    #                         module_directory=os.path.join(self.scirpt_path, 'makoCache'))
+    #     content = template.render(
+    #         contexts=self.contexts,
+    #         source_path=self.source,
+    #     )
+    #     file.write(content.replace('\n', ''))
 
     def generate_reactive_system(self):
         for key, context in self.contexts.items():
@@ -475,19 +502,47 @@ class BaseParser:
 
         return
 
+    def get_attr_by_define(self, attr_define, context : ContextEntity):
+        comps = context.components.value
+        ret = []
+        # print(len(comps))
+        for comp in comps:
+            if comp.hasAttrs():
+                attrs = comp.attrs.value # type:list[AttrEntity]
+                for attr in attrs:
+                    name = attr.name.value.replace(' ', '')
+                    if name in attr_define.attrList:
+                        ret.append(attr)
+
+        return ret
+
+    def generate_attrs(self):
+        for attr in self.attrDefine:
+            for key, context in self.contexts.items():
+                attrs = self.get_attr_by_define(attr, context)
+                path = "src.luaentitas.Parser.AttrHandler.{0}Handler.{0}Handler".format(attr.Key)
+                model_path, class_name = path.rsplit(".", 1)
+                model = importlib.import_module(model_path)  # 根据"auth.my_auth"导入my_auth模块
+                obj: BaseAttrHandler = getattr(model, class_name)(attr)
+                obj.set_contexts(context)
+                obj.set_attrs(attrs)
+                obj.start_handle()
+
+
+
     def before_generate(self):
         for key, context in self.contexts.items():
-            cmpfun = operator.attrgetter('name')
-            context.components.sort(key = cmpfun)
-            context.event_comps.sort(key = cmpfun)
+            cmpfun = operator.attrgetter('name.name')
+            context.components.value.sort(key = cmpfun)
+            # context.event_comps.value.sort(key = cmpfun)
         return
 
     def generate(self):
-        self.generate_event()
         self.before_generate()
         self.generate_context()
         self.generate_component()
         self.generate_entity()
-        self.generate_matcher()
         self.generate_autoinc()
-        self.generate_auto_service_inc()
+        # self.generate_auto_service_inc()
+
+        self.generate_attrs()

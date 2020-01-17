@@ -1,29 +1,24 @@
+<%
+    Context_name = _context.name.Name
+    components = _context.components.value
+    source_path = _context.source.value
+%>
 local make_component = require("${source_path}.MakeComponent")
 local Components = {}
-<%
-    def params_str(a, sep = ', ' , b = []):
-        b = []
-        for item in a:
-            b.append('"' + item[0] + '"')
-        return sep.join(b)
-    components = contexts.components
-%>\
+
 %for comp in components:
 <%
-    Name = comp.Name
-    name =  comp.name
-    Context_name = context_name[0].upper() + context_name[1:]
-    properties = comp.data
+    Name = comp.name.Name
+    name =  comp.name.name
+    properties = comp.get_properties()
 %>\
-    %if not comp.simple:
----@class ${Context_name}.${Name}Component
-        %for i in range(len(properties)):
----@field ${properties[i][0]} ${comp.get_property(i, contexts)}
-        %endfor
-Components.${Name} = make_component('${name}',  ${params_str(properties)})
-    %else:
+    %if not comp.hasIsSimple():
 ---@class ${Context_name}.${Name}Component
 Components.${Name} = make_component('${name}')
+    %else:
+---@class ${Context_name}.${Name}Component
+${comp.get_properties_define()}
+Components.${Name} = make_component('${name}',  ${comp.get_params_str()})
     %endif
 %endfor
 

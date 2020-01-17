@@ -61,8 +61,27 @@ class Entity(object):
                 'Cannot add another component {!r} to {}.'
                 .format(comp_type.__name__, self))
 
-        new_comp = comp_type._make(args)
+        new_comp = comp_type(*args)
         self._components[comp_type] = new_comp
+        exec('self.{} = new_comp'.format(comp_type._name), globals(), locals())
+        self.on_component_added(self, new_comp)
+
+    def add_with_component(self, comp_type, new_comp):
+        """Adds a component.
+        :param comp_type: namedtuple type
+        """
+        if not self._is_enabled:
+            raise EntityNotEnabled(
+                'Cannot add component {!r}: {} is not enabled.'
+                .format(comp_type.__name__, self))
+
+        if self.has(comp_type):
+            raise AlreadyAddedComponent(
+                'Cannot add another component {!r} to {}.'
+                .format(comp_type.__name__, self))
+
+        self._components[comp_type] = new_comp
+        exec('self.{} = new_comp'.format(comp_type._name), globals(), locals())
         self.on_component_added(self, new_comp)
 
     def remove(self, comp_type):
@@ -101,9 +120,11 @@ class Entity(object):
         previous_comp = self._components[comp_type]
         if args is None:
             del self._components[comp_type]
+            exec('self.{} = None'.format(comp_type._name), globals(), locals())
             self.on_component_removed(self, previous_comp)
         else:
-            new_comp = comp_type._make(args)
+            new_comp = comp_type(*args)
+            exec('self.{} = new_comp'.format(comp_type._name), globals(), locals())
             self._components[comp_type] = new_comp
             self.on_component_replaced(self, previous_comp, new_comp)
 

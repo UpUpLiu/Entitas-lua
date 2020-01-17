@@ -8,54 +8,60 @@ return {
         data = {
             'value : object'
         },
-        tag = tag.Attr
+        tag = {tag.Attr}
     },
-    target = {
+    eventType = {
         data = {
             'value : object'
         },
-        tag = tag.Attr
+        tag =  {tag.Attr}
     },
-    type = {
+    dates = {
         data = {
             'value : object'
         },
-        tag = tag.Attr
+        tag =  {tag.Attr}
     },
     priority = {
         data = {
             'value : object'
         },
-        tag = tag.Attr
+        tag =  {tag.Attr}
     },
     action = {
         data = {
             'value : object'
         },
-        tag = tag.Attr
+        tag =  {tag.Attr}
     },
-    className = {
+    name = {
         data = {
             'value : object'
         },
-        tag = tag.Attr
+        tag = {tag.Attr}
     },
-    primaryIndex = {
+    parseAttr = {
         data = {
-            'value : object'
+            'value : value'
         },
-        tag = tag.Attr
+        tag = {tag.Attr}
     },
-    index = {
+
+    component = {
         data = {
-            'value : object'
+            'value : data'
         },
-        tag = tag.Attr
+        tag = {tag.Attr}
     },
-    muIndex = {
-        data = {
-            'value : object'
+
+    handleTogether = {
+        tag = {tag.Attr}
+    },
+
+    context = {
+       data = {
+            'data : value'
         },
-        tag = tag.Attr
-    }
+        tag = {tag.Attr}
+    },
 }

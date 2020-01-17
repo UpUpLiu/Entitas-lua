@@ -1,19 +1,7 @@
 <%
-    Context_name = context_name[0].upper() + context_name[1:]
-    components = contexts.components
-    event_comps = contexts.event_comps
-    import json
-    def params(a, sep = ', ' , b = []):
-        b = []
-        for item in a:
-            b.append(item[0])
-        return sep.join(b)
-
-    def params_str(a, sep = ', ' , b = []):
-        b = []
-        for item in a:
-            b.append('"' + item[0] + '"')
-        return sep.join(b)
+    Context_name = _context.name.Name
+    context_name =_context.name.name
+    components = _context.components.value
 %>\
 local ${Context_name}_comps = require('.${context_name}Components')
 local set = require('Common.container.set')
@@ -21,12 +9,11 @@ local set = require('Common.container.set')
 ---@class ${Context_name}Entity
 % for comp in components:
 <%
-    Name = comp.Name
-    name =  comp.name
-    Context_name = context_name[0].upper() + context_name[1:]
-    properties = comp.data
+    Name = comp.name.Name
+    name =  comp.name.name
+    properties = comp.get_properties()
 %>\
-        %if not comp.simple:
+        %if not comp.hasIsSimple():
 ---@field ${name} ${Context_name}.${Name}Component
         %endif
 % endfor
@@ -38,28 +25,25 @@ end
 
 %for comp in components:
 <%
-    Name = comp.Name
-    name =  comp.name
-    Context_name = context_name[0].upper() + context_name[1:]
-    properties = comp.data
+    Name = comp.name.Name
+    name =  comp.name.name
+    properties = comp.get_properties()
 %>
-    %if not comp.simple:
+    %if not comp.hasIsSimple():
 ---@return boolean
 function ${Context_name}Entity:has${Name}()
   return self:has(${Context_name}_comps.${Name}) ~= nil
 end
 
-        %for i in range(len(properties)):
----@param ${properties[i][0]} ${comp.get_property(i, contexts)}
-        %endfor
+${comp.get_properties_define()}
 ---@returns ${Context_name}Entity
-function ${Context_name}Entity:add${Name} (${params(properties)})
-    self:add(${Context_name}_comps.${Name}, ${params(properties)})
+function ${Context_name}Entity:add${Name} (${comp.get_params()})
+    self:add(${Context_name}_comps.${Name}, ${comp.get_params()})
     return self
 end
 
-function ${Context_name}Entity:replace${Name} (${params(properties)})
-    self:replace(${Context_name}_comps.${Name}, ${params(properties)})
+function ${Context_name}Entity:replace${Name} (${comp.get_params()})
+    self:replace(${Context_name}_comps.${Name}, ${comp.get_params()})
     return self
 end
 
@@ -86,34 +70,6 @@ function ${Context_name}Entity:set${Name}(v)
 end
     %endif
 %endfor
-%if event_comps:
-    %for comp in event_comps:
-function ${Context_name}Entity:Add${comp.Name}CallBack(callback, target)
-    local list
-    if not self:has${comp.Name}() then
-        list = set.new(false)
-    else
-        list = self.${comp.name}.value
-    end
-    list:insertkv(callback, target)
-    self:replace${comp.Name}(list)
-end
-
-function ${Context_name}Entity:Remove${comp.Name}CallBack(callback, removeComponentWhenEmpty)
-    if removeComponentWhenEmpty == nil then
-        removeComponentWhenEmpty = true
-    end
-    local listeners = self.${comp.name}.value
-    listeners:remove(callback)
-    if removeComponentWhenEmpty and listeners:size() == 0 then
-        self:remove${comp.Name}()
-    else
-        self:replace${comp.Name}(listeners)
-    end
-end
-    %endfor
-%endif
-
 
 
 return ${Context_name}Entity

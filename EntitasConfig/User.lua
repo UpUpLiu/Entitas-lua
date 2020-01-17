@@ -1,31 +1,31 @@
 return {
     player = { -- 道具配置
         data = {
-            "player : ${pre_tag}PlayerEntity"
+            "player : PlayerEntity"
         },
         tag = { tag.User }
     },
     prop  = {  --道具信息
         data ={
-            "value : ${pre_tag}PropEntity",
+            "value : PropEntity",
         },
         tag = { tag.User }
     },
     dress  = {  --衣服信息
         data ={
-            "value : ${pre_tag}DressEntity",
+            "value : DressEntity",
         },
         tag = { tag.User }
     },
     stage  = {  --关卡信息
         data ={
-            "value : ${pre_tag}StageEntity",
+            "value : StageEntity",
         },
         tag = { tag.User }
     },
     task  = {  --任务信息
         data ={
-            "value : ${pre_tag}TaskEntity",
+            "value : TaskEntity",
         },
         tag = { tag.User }
     }

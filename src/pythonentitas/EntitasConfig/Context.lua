@@ -3,36 +3,37 @@ return {
         data = {
             'value : []'
         },
-        tag = tag.Context
+        tag = {tag.Context}
     },
     source = {
         data = {
             'value : string'
         },
-        tag = tag.Context
+        tag = {tag.Context}
     },
     name = {
         data = {
-            'value : string'
+            'name : string',
+            'Name : string'
         },
-        tag = tag.Context
-    },
-    Name = {
-        data = {
-            'value : string'
-        },
-        tag = tag.Context
+        tag = {tag.Context}
     },
     muIndex = {
         data = {
             'value : []'
         },
-        tag = tag.Context
+        tag = {tag.Context}
     },
     tag = {
         data = {
             'value : string'
         },
-        tag = tag.Context
+        tag = {tag.Context}
     },
+    outPut = {
+        data = {
+            'value : string'
+        },
+        tag = {tag.Context}
+    }
 }

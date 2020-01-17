@@ -13,6 +13,7 @@ EventTarget = {
 EventType = {
 	ADDED = 'ADDED',
 	REMOVED = 'REMOVED',
+	ALL = 'ALL',
 }
 
 tag = {
@@ -23,8 +24,8 @@ tag = {
 local entitas = {
 	namespace ="Entitas",
 	source ="Common.entitas",
-	output ="../Common/Generated/entitas",
-	service_path = "../src/Entitas",
+	output ="../Generated/Entitas",
+	service_path = "../Generated",
 	context_index = "ContextIndex",
 	parse = "lua",
 	tag = tag
