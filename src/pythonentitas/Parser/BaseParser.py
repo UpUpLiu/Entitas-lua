@@ -52,7 +52,6 @@ class Event(AttrClass):
         self.type = None
         self.priority = 0
         self.action = None
-
     def on_init(self):
         self.event = None
         return

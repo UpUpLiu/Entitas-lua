@@ -1,1 +1,0 @@
----@class UserServicelocal M = {}return M

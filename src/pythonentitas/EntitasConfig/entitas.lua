@@ -17,7 +17,8 @@ EventType = {
 
 tag = {
 	Component = 'Component',
-	Context = 'Context'
+	Context = 'Context',
+	Attr = 'Attr'
 }
 local entitas = {
 	namespace ="Entitas",
