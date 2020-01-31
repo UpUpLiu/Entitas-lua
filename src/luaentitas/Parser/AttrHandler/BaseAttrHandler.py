@@ -27,6 +27,10 @@ class BaseAttrHandler:
     def set_attrs(self, attrs):
         self.attrs = attrs
 
+    @staticmethod
+    def parse_attr(attr):
+        return
+
     def get_out_file_name(self):
         return self.attr_define.Key
 

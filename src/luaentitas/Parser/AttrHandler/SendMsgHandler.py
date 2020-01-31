@@ -36,6 +36,24 @@ class SendMsgHandler(BaseAttrHandler):
         file.close()
         context.add_custom_inc("require('.{0}')".format(str( context.name.Name + comp.name.Name + 'SendEventSystem')))
 
+    @staticmethod
+    def parse_attr(attr:AttrEntity):
+        data = attr.dates.value
+        attr.replaceEventType(data)
+        ret_str = ""
+        if attr.eventType.value == 'ADDED':
+            ret_str = 'GroupEvent.ADDED'
+        elif attr.eventType.value == "REMOVED":
+            ret_str = 'GroupEvent.REMOVED'
+        elif attr.eventType.value == "ALL":
+            ret_str = 'GroupEvent.ADDED | GroupEvent.REMOVED'
+        attr.replaceEventTypeGroupStr(ret_str)
+
+    def generate_event_name(self, attrs):
+        # todo: 生成消息
+        return
+
     def start_handle(self):
         for attr in self.attrs:
             self.render_mako(attr, self.context)
+        self.generate_event_name(self.attrs)

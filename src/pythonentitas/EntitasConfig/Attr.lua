@@ -16,6 +16,18 @@ return {
         },
         tag =  {tag.Attr}
     },
+    eventTarget = {
+        data = {
+            'value : string',
+        },
+        tag = {tag.Attr}
+    },
+    eventTypeGroupStr = {
+        data = {
+            'value : string'
+        },
+        tag = {tag.Attr}
+    },
     dates = {
         data = {
             'value : object'
@@ -46,7 +58,13 @@ return {
         },
         tag = {tag.Attr}
     },
-
+    generateCompName = {
+        data = {
+            'name : string',
+            'Name : string'
+        },
+        tag = {tag.Attr}
+    },
     component = {
         data = {
             'value : data'

@@ -10,7 +10,7 @@ from pathlib import Path
 
 lua = LuaRuntime()
 
-class LuaParser(BaseParser):
+class PythonParser(BaseParser):
     def __init__(self, configPath):
         self.scirpt_path = Path(os.path.split(os.path.realpath(__file__))[0])
         self.config_path = configPath
@@ -97,4 +97,4 @@ class test():
 
 if __name__ == "__main__":
     # test().pp('test')
-    LuaParser( Path(utils.get_python_fiel_Path(__file__) + "/../EntitasConfig")).generate()
+    PythonParser( Path(utils.get_python_fiel_Path(__file__) + "/../EntitasConfig")).generate()

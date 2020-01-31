@@ -15,8 +15,9 @@ class ComponentEntity(Entity):
     def __init__(self):
         super().__init__()
 
-    def addAttr(self, key, data):
-        key = key.replace(' ', '')
+    def addAttr(self, data):
+        assert data.attr_define, "attr must have attr_define," + self.name.name
+        key = data.attr_define.replace(' ', '')
         if self.hasAttrs():
             atts = self.attrs.value
         else:
@@ -26,6 +27,19 @@ class ComponentEntity(Entity):
         attr.replaceName(key)
         if data is not None:
             attr.set_attr_data(data)
+        attr.replaceComponent(self)
+        atts.append(attr)
+        self.replaceAttrs(atts)
+
+    def addAttr_custom(self, key):
+        key = key.replace(' ', '')
+        if self.hasAttrs():
+            atts = self.attrs.value
+        else:
+            atts = []
+        from pythonentitas.Generated.Entitas.Contexts import Contexts
+        attr = Contexts.attr.create_entity()
+        attr.replaceName(key)
         attr.replaceComponent(self)
         atts.append(attr)
         self.replaceAttrs(atts)
@@ -63,7 +77,7 @@ class ComponentEntity(Entity):
                 spret = data.split('@')
                 spret[0] = spret[0].replace(' ', '')
                 dates[index] = spret[0]
-                attr = self.addAttr(spret[1], None)
+                attr = self.addAttr_custom(spret[1])
                 attr.replaceParseAttr(spret[0])
         self.replaceDates(dates)
 

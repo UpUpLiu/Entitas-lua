@@ -18,5 +18,23 @@ class AttrEntity(Entity):
     def set_attr_data(self, data):
         if self.name.value == 'SendMsg':
             self.replaceEventType(data)
+            ret_str = ""
+            if self.eventType.value == 'ADDED':
+                ret_str = 'GroupEvent.ADDED'
+            elif self.eventType.value == "REMOVED":
+                ret_str = 'GroupEvent.REMOVED'
+            elif self.eventType.value == "ALL":
+                ret_str = 'GroupEvent.ADDED | GroupEvent.REMOVED'
+            self.replaceEventTypeGroupStr(ret_str)
+
         self.replaceDates(data)
+        return
+
+    def get_event_target_is_self(self):
+        if self.hasEventTarget() and self.eventTarget.value == "Self":
+            return True
+        return False
+
+    def get_attr_system_name(self):
+
         return

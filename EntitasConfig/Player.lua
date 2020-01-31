@@ -3,16 +3,7 @@ return {
         data = {
             "value : string @ index"
         },
-        tag = { tag.Player},
-        event = {
-            {
-                target = EventTarget.Any,
-                type = EventType.ADDED,
-            },
-            {
-                target = EventTarget.self
-            }
-        }
+        tag = { tag.Player}
     },
     exp = { --经验
         data = {

@@ -2,7 +2,7 @@
 import os
 from pathlib import Path
 
-from src.luaentitas.Parser.BaseParser import BaseParser, ContextData, Component, MuIndex
+from src.luaentitas.Parser.BaseParser import BaseParser
 import json
 import src.utils as utils
 from lupa import *
@@ -44,11 +44,7 @@ class LuaParser(BaseParser):
 
     def get_component(self, key, table):
         comp = Contexts.component.create_component(key)
-        # print("2",list(table.tag), key , )
-        # if table.data:
-        #     print('3', list(table.data.values()))
         comp.replaceTags(list(table.tag))
-        # print(comp.tags.value)
         if table.data:
             comp.set_component_data(list(table.data.values()))
         else:
@@ -59,30 +55,10 @@ class LuaParser(BaseParser):
 
         comp.replaceTags(list(table.tag.values()))
 
-        if table.event is not None:
-            comp.replaceEvents(table.event)
-
         if table.attr is not None:
             for at in table.attr:
-                comp.addAttr(at, table.attr[at])
+                comp.addAttr(table.attr[at])
 
-        return comp
-
-    def parse_context(self, key, table):
-        context_files = utils.get_file_list_with_suffix(self.config_path, '.' + self.parser_tag)
-        comp = Component(key)
-        if table.data:
-            comp.set_data(list(table.data.values()))
-        if table.single is not None:
-            comp.set_single(True)
-
-        comp.set_tag(list(table.tag.values()))
-        if table.event is not None:
-            comp.set_event(table.event)
-
-        # if table.attr is not None:
-        #     for at in table.attr:
-        #         comp.add_attr(at, at)
         return comp
 
     def load_base_config(self):

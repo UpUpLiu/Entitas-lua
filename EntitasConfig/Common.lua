@@ -3,9 +3,6 @@ return {
 		data ={
 			"value : long @ primaryIndex"
 		},
-        Events = {
-
-        },
         tag = { tag.Player, tag.User }
     },
     destroy = {

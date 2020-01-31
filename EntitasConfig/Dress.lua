@@ -3,9 +3,17 @@ return {
         data ={
             "value : number"
         },
+
         attr = {
-            Event = {},
-            SendMsg = EventType.ALL
+            {
+                attr_define = 'Event',
+                eventTarget = EventTarget.Self,
+                eventType = EventType.ADDED,
+            },
+            {
+                attr_define = 'SendMsg',
+                eventType = EventType.ALL
+            }
         },
         tag = { tag.Dress}
     },

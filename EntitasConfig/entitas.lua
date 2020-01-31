@@ -6,7 +6,7 @@
 ---@class entitas.gen.EventTarget
 EventTarget = {
 	Any = 'Any',
-	self = 'self'
+	Self = 'Self'
 }
 
 ---@class entitas.gen.EventType
