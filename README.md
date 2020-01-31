@@ -4,7 +4,7 @@
 
 # 如何安装：
 1. 需要Python3.x环境   (配置环境变量)
-2. 安装python模板引擎Mako, lupa, pathlib
+2. 安装python模板引擎Mako, 用于解析lua代码的差距 lupa, 用于处理跨平台生成的 pathlib
    pip install mako
    pip install lupa
    pip install pathlib
@@ -19,7 +19,7 @@ EntitasConfig路径下的文件为Ecs的生成配置，  这是一个简单的�
 
 配合使用Emmlylua插件为最佳体验， 感谢阿唐为我们提供如此好用的lua插件。（没有EmmyLua插件。。Ecs_lua使用体验会差很多)
 
-原版本参照Entitas-csharp 和 [entitas-lua](https://github.com/sniper00/entitas-lua). 
+原版本参照Entitas-csharp 和 [entitas-lua](https://github.com/sniper00/entitas-lua).  有较大修改.
 
 因为以前的版本参照ts实现较为复杂, 所以使用别人已经写好的简单版本.
 
@@ -31,97 +31,109 @@ EntitasConfig路径下的文件为Ecs的生成配置，  这是一个简单的�
 
 # 配置说明:  
   ## 首先是 配置根文件  entitas.lua  用于全局配置:
-   ```
-   ---@class entitas.gen.EventTarget
-      EventTarget = {  --事件目标类型
-         Any = 'Any',
-         self = 'self'
-      }
+```
+---@class entitas.Event
+---@field eventTarget entitas.gen.EventTarget
+---@field eventType entitas.gen.EventType
+---@field priority number
 
-      ---@class entitas.gen.EventType
-      EventType = {  -- 事件类型
-         ADDED = 'ADDED',
-         REMOVED = 'REMOVED',
-      }
+---@class entitas.EventTarget
+EventTarget = {  -- 事件目标
+	Any = 'Any',
+	Self = 'Self'
+}
 
-      tag = {    --Context 标记
-         Player = 'Player',
-         Prop = 'Prop',
-         Dress = 'Dress',
-         User = 'User',
-         PlayPlayer = 'PlayPlayer',
-         Stage = 'Stage'
-      }
-      local entitas = {
-         namespace ="Entitas",  --命名空间,  暂时无用
-         source ="Common.entitas", -- entita的源文件位置(用于require)
-         output ="../Common/Generated/entitas",  输出位置
-         parse = "lua",  -- 解析方式  目前只有lua  (因为之前有打算支持多种配置  最开始的配置用的是json  因为我有用于开发 h5)
-         tag = tag       -- contexts的tag组
-      }
-      
-## 工具会自动获取与entitas.lua 同路径下的lua文件, 运行 并检查返回值的Component:
- --- return {
-    name ={  --名字
-        data = {          如果Component不是标记Component, 那么需要定义data 用于说明变量
-            "value : string @ index"  格式为:  变量名 : 注释名字 @ attr | attr .. (目前字段的 attr仅支持 index 和 primaryIndex)
+---@class entitas.EventType
+EventType = {    --事件目标类型
+	ADDED = 'ADDED',
+	REMOVED = 'REMOVED',
+	ALL = 'ALL',
+}
+
+
+
+AttrDefine = {    --扩展定义
+	Index = {     --属性扩展  对应IndexHandler
+		attrList = {
+			'index', 'primaryIndex', 'muIndex'
+		},
+		handleTogether = true
+	},
+
+	Event = {    -- 事件扩展, EventHandler
+	},
+
+	SendMsg = {  -- 发送事件类型扩展, 对应 SendMsgHandler
+	},
+
+	--其他你相遇扩展的自定义属性, 可以参考 SendMsg进行扩展处理 用户扩展生成的方式
+}
+
+tag = {    --tag 定义, 每个component 都必须有至少一个tag的定义
+	Player = 'Player',
+	Prop = 'Prop',
+	Dress = 'Dress',
+	User = 'User',
+	PlayPlayer = 'PlayPlayer',
+	Stage = 'Stage'
+}
+
+local entitas = {    --总配置     用于配置路径和一些其他设置
+	namespace ="Entitas",   --生成的命令空间, 用emmylua插件的时候 对于class 的标记 有命名空间的需求(暂时没用上)
+	source ="Common.entitas",  -- luaentitas 底层代码路径( 用于生成require路径)
+	output ="../Common/Generated/entitas",   -- 生成代码输出位置
+	service_path = "../src/Entitas",      -- 对于每一个context都会生成一个service, 这个是存放路径
+	parse = "lua",                -- 解析后缀, 本意是可以提供不同的配置和生成器, 用于生成不同语言的版本, (我之前有做htm5), 但是json不能有注释, 所以放弃了对于json的支持
+	tag = tag,     --tag组
+	AttrDefine = AttrDefine  -- 属性扩展组
+}
+return entitas
+```
+
+## 工具会自动获取与entitas.lua 同路径下的lua文件, 运行 并检查返回值的
+Component:
+```
+
+return {
+    type_id = {   -- component名字
+        data ={  -- component数据定义, 如果没有定义数据, 则默认为是标记component
+            "value : number" 格式为:  变量名 : 注释名字 @ attr | attr .. (目前字段的 attr仅支持 index 和 primaryIndex 这个属于内置支持)
         },
-        tag = { tag.Player},   --标记这个Component 属于那个 Context, 可以配置多个
-        event = {             -- 标记这个Compoent 需要自动生成 事件System
-            {
-                target = EventTarget.Any, -- 目标类型
-                type = EventType.ADDED,   -- 事件类型  默认ADDED
-                priority = --0,  --优先级 (这个暂未实现) 默认0
+		-- 对于标记类型, 不会生成replace方法, 相应的会生成一个 set方法, 用于区分
+        attr = {  -- 扩展属性定义, 每一个扩展属性定义都是一个table, 且以数组形式排列
+            { 
+                attr_define = 'Event',  -- 属性名 会用名字 + Handler 找到用于处理这个属性的脚本, 并运行
+                eventTarget = EventTarget.Self,  -- 属性参数 对于事件类型, 需要提供target参数( 详细请参照原版)
+                eventType = EventType.ADDED,    -- 属性参数 对于事件类型, 需要提供target参数( 详细请参照原版)
             },
             {
-                target = EventTarget.self
+                attr_define = 'SendMsg', -- 属性名 会用名字 + Handler 找到用于处理这个属性的脚本
+                eventType = EventType.ALL  -- 对于sendmsg类型, 也需要关心事件类型.
             }
-        }
-    },
-    uid = {
-		data ={
-			"value : long @ primaryIndex"
-		},
-        Events = {
-
         },
-        tag = { tag.Player, tag.User }  --支持多个Context配置
+        tag = { tag.Dress} --标记这个component 属于那个 context, 可以配置多个
     },
-    exp = { --经验
+    num = {
         data = {
             "value : number"
         },
-        tag = { tag.Player},
+        tag = { tag.Dress}
 
     },
-    coin = {  --金币
+    config = { -- 衣服配置
+        data = {
+            "value : DressTemplateData"
+        },
+        tag = { tag.Dress}
+    },
+    itemInfo = {  --道具信息
         data ={
-            "value : number",
+            "value : ItemInfo",
         },
-        tag = { tag.Player}
-
-    },
-    gem = { --钻石
-        data = {
-            "value : number"
-        },
-        tag = { tag.Player}
-    },
-    lvl = { --等级
-        data = {
-            'value : number'
-        },
-        tag = { tag.Player}
-    },
-    energy = { --体力
-        data = {
-            'value : number'
-        },
-        tag = { tag.Player}
+        tag = { tag.Dress}
     }
 }
 ```
-
 
 # 简单展示
 生成代码之后得使用体验
@@ -143,7 +155,9 @@ EntitasConfig路径下的文件为Ecs的生成配置，  这是一个简单的�
 4. 支持index和primaryindex标签 已完成
 6. 配置文件优化, 支持以tag方式区分不同的Context 已完成
 7. 增加sync类型,  用于双端架构, 用于对客户端和服务器自动同步数据使用
-8. 提供统一的 attr 自定义 方式
+8. 提供统一的 attr 自定义 方式    已完成  也是提供扩展的统一方式
 9. 简单的Demo
-1o. 生成代码 改为用python_Entitas实现
+1o. 生成代码 改为用python_Entitas实现    --已完成  不过目前是同时在一个仓库, 考虑抽出代码, 将python的代码生成 成为一个单独的库
 11. 优化matcher的匹配规则, 把字符串拼接拿掉
+12. 完整的测试代码    已完成 ( 重构之后, 已经变得不能跑通,  主要是attr的生成测试 应该不能通过) 会尽快修复
+
