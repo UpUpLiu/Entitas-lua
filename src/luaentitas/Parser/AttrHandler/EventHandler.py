@@ -3,7 +3,7 @@ import os
 from mako.template import Template
 
 import utils
-from pythonentitas.Generated.Entitas.AttrEntity import AttrEntity
+from pythonentitas import AttrEntity
 from .BaseAttrHandler import BaseAttrHandler
 
 
