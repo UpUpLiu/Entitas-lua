@@ -25,6 +25,8 @@ class Context(object):
 
         self._entity_indices = {}
 
+        self.entity_class = Entity
+
     @property
     def entities(self):
         return self._entities
@@ -42,7 +44,7 @@ class Context(object):
         Then adds the entity to the list.
         """
         entity = (self._reusable_entities.pop() if self._reusable_entities
-                  else Entity())
+                  else self._create_entity())
 
         entity.activate(self._entity_index)
         self._entity_index += 1
@@ -102,6 +104,12 @@ class Context(object):
 
         return group
 
+    def set_entity_class(self, entity_class):
+        self.entity_class = entity_class
+
+    def _create_entity(self):
+        return self.entity_class()
+
     def set_unique_component(self, comp_type, *args):
         entity = self.create_entity()
         new_comp = comp_type.new(...)
@@ -110,6 +118,10 @@ class Context(object):
 
         comp = entity.add_with_component(comp_type, new_comp)
         return comp, entity
+
+    def has_unique_component(self, comp_type):
+        name = comp_type._name
+        return exec('self.{0}Entity is not None'.format(name), globals(), locals())
 
     def remove_unique_component(self, name):
         oldEntity = exec('self.{0}Entity'.format(name), globals(), locals())

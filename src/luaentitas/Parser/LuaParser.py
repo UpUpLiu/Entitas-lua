@@ -6,7 +6,7 @@ from src.luaentitas.Parser.BaseParser import BaseParser
 import json
 import src.utils as utils
 from lupa import *
-from src.pythonentitas.Generated.Entitas.Contexts import Contexts
+from pythonentitas.Generated.Contexts import Contexts
 lua = LuaRuntime()
 
 class LuaParser(BaseParser):

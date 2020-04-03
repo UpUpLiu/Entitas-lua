@@ -8,8 +8,8 @@ import collections
 import importlib
 
 from luaentitas.Parser.AttrHandler import BaseAttrHandler
-from pythonentitas.Generated.Entitas.AttrEntity import AttrEntity
-from pythonentitas.Generated.Entitas.ContextEntity import ContextEntity
+from pythonentitas import AttrEntity
+from pythonentitas import ContextEntity
 
 CLIENT_LUA_PROJECT_ROOT = Path( build_config.CLIENT_LUA_PROJECT_ROOT)
 import operator

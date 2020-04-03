@@ -4,11 +4,11 @@ from pathlib import Path
 from mako.template import Template
 
 import utils
-from pythonentitas.Generated.Entitas.ContextEntity import ContextEntity
+# from pythonentitas.Generated.Entitas.ContextEntity import ContextEntity
 
 
 class BaseAttrHandler:
-    context: ContextEntity
+    # context: ContextEntity
 
     def __init__(self, attr_define):
         self.attr_define = attr_define
